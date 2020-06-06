@@ -38,20 +38,45 @@ insertNinjas lines = map insertNinja lines   --send all lines to insertNinja fun
 
 
 insertNinja :: [Char] -> [Ninja]
-insertNinja x = case ((xWords !! 1) !! 0) of
-                  'F' -> do
+insertNinja x = case (xWords !! 1) of
+                  "Fire" -> do
                          let temp = (Ninja {name=(xWords !! 0), country = ((xWords !! 1) !! 0), status = "Junior", exam1 = read (xWords !! 2) :: Float, exam2 = read (xWords !! 3) :: Float, ability1 = (xWords !! 4), ability2 = (xWords !! 5), r = 0})
                          fire <- fireAdder temp
                          return fire
-                  --'L' -> (Ninja {name=(xWords !! 0), country = ((xWords !! 1) !! 0), status = "Junior", exam1 = read (xWords !! 2) :: Float, exam2 = read (xWords !! 3) :: Float, ability1 = (xWords !! 4), ability2 = (xWords !! 5), r = 0}) : lightning
-                  --'N' -> (Ninja {name=(xWords !! 0), country = ((xWords !! 1) !! 0), status = "Junior", exam1 = read (xWords !! 2) :: Float, exam2 = read (xWords !! 3) :: Float, ability1 = (xWords !! 4), ability2 = (xWords !! 5), r = 0}) : wind
-                  --'W' -> (Ninja {name=(xWords !! 0), country = ((xWords !! 1) !! 0), status = "Junior", exam1 = read (xWords !! 2) :: Float, exam2 = read (xWords !! 3) :: Float, ability1 = (xWords !! 4), ability2 = (xWords !! 5), r = 0}) : water
-                  --'E' -> (Ninja {name=(xWords !! 0), country = ((xWords !! 1) !! 0), status = "Junior", exam1 = read (xWords !! 2) :: Float, exam2 = read (xWords !! 3) :: Float, ability1 = (xWords !! 4), ability2 = (xWords !! 5), r = 0}) : earth
+                  "Lightning" -> do
+                         let temp = (Ninja {name=(xWords !! 0), country = ((xWords !! 1) !! 0), status = "Junior", exam1 = read (xWords !! 2) :: Float, exam2 = read (xWords !! 3) :: Float, ability1 = (xWords !! 4), ability2 = (xWords !! 5), r = 0})
+                         lightning <- lightningAdder temp
+                         return lightning
+                  "Water" -> do
+                         let temp = (Ninja {name=(xWords !! 0), country = ((xWords !! 1) !! 0), status = "Junior", exam1 = read (xWords !! 2) :: Float, exam2 = read (xWords !! 3) :: Float, ability1 = (xWords !! 4), ability2 = (xWords !! 5), r = 0})
+                         water <- waterAdder temp
+                         return water
+                  "Wind"  -> do
+                         let temp = (Ninja {name=(xWords !! 0), country = ((xWords !! 1) !! 2), status = "Junior", exam1 = read (xWords !! 2) :: Float, exam2 = read (xWords !! 3) :: Float, ability1 = (xWords !! 4), ability2 = (xWords !! 5), r = 0})
+                         wind <- windAdder temp
+                         return wind
+                  "Earth" -> do
+                         let temp = (Ninja {name=(xWords !! 0), country = ((xWords !! 1) !! 0), status = "Junior", exam1 = read (xWords !! 2) :: Float, exam2 = read (xWords !! 3) :: Float, ability1 = (xWords !! 4), ability2 = (xWords !! 5), r = 0})
+                         earth <- earthAdder temp
+                         return earth
                 where 
                    xWords = words (x)
                    
 fireAdder :: Ninja -> [Ninja]
 fireAdder temp = temp : fire
+
+windAdder :: Ninja -> [Ninja]
+windAdder temp = temp : wind
+
+waterAdder :: Ninja -> [Ninja]
+waterAdder temp = temp : water
+
+earthAdder :: Ninja -> [Ninja]
+earthAdder temp = temp : earth
+
+lightningAdder :: Ninja -> [Ninja]
+lightningAdder temp = temp : lightning
+
 
 printMenu input = do 
               putStrLn "a) View a Country's Ninja Information\nb) View All Countries' Ninja Information"
@@ -75,11 +100,12 @@ main = do
     let x = fileLines !! 1
     putStrLn (show (typeOf (x)))
     let naruto = (Ninja {name=(words (x) !! 0), country = ((words (x) !! 1) !! 0), status = "Junior", exam1 = read (words (x) !! 2) :: Float, exam2 = read (words (x) !! 3) :: Float, ability1 = (words (x) !! 4), ability2 = (words (x) !! 5), r = 0}) : fire
-    let allLists = insertNinjas fileLines
+    let allLists = insertNinjas fileLines -- allLists type : [[Ninja]]
     putStrLn (show (typeOf (lightning)))
     --let lightning = (Ninja {name=(words (x) !! 0), country = ((words (x) !! 1) !! 0), status = "Junior", exam1 = read (words (x) !! 2) :: Float, exam2 = read (words (x) !! 3) :: Float, ability1 = (words (x) !! 4), ability2 = (words (x) !! 5), r = 0}) : lightning
    -- putStrLn (show (name (head (insertNinjas fileLines)))) -- şu an sadece txtnin son satırını alıyor ama lightninge de ekememiş anlamadım
-    putStrLn (show (name (head (head (allLists)))))
+    putStrLn (show (name (head (head (tail (allLists))))))
+    putStrLn (show (name (head (head (tail (tail (tail (tail (tail (allLists))))))))))
     putStrLn (show (length allLists))
     printMenu fileLines
     --putStr (name naruto)
