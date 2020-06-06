@@ -4,8 +4,8 @@ import Data.Typeable
 import System.IO
 
 
-data Ninja = Ninja {name:: String, country:: Char, status:: String, exam1:: Float, exam2:: Float, ability1:: String, ability2:: String, r:: Int} deriving Show
---status initialized as junior
+data Ninja = Ninja {name:: String, country:: Char, status:: String, exam1:: Float, exam2:: Float, ability1:: String, ability2:: String, r:: Int, score:: Float} deriving Show
+--status initialized as junior --> will be upgraded to journeyman
 --r is number of rounds ninja took place, initialized as 0
 --according to design we can add score 
 
@@ -21,17 +21,25 @@ wind = []
 earth :: [Ninja]
 earth = []
 
---insertNinjas :: [Char] -> [Ninja]
---insertNinjas contents@(x:xs) = case x of 
+findAbility :: String -> Float
+findAbility a = case a of
+        "Clone"     -> 20.0
+        "Hit"       -> 10.0
+        "Lightning" -> 50.0
+        "Vision"    -> 30.0
+        "Sand"      -> 50.0
+        "Fire"      -> 40.0
+        "Water"     -> 30.0
+        "Blade"     -> 20.0
+        "Summon"    -> 50.0
+        "Storm"     -> 10.0
+        "Rock"      -> 20.0
+        
+abilitySum :: (String -> Float) -> String -> String -> Float
+abilitySum findAbility a b = findAbility a + findAbility b
 
---insertNinjas :: [[Char]] -> Ninja
---insertNinjas lines@(x:xs) = case ((words (x)) !! 1) of -- x is a line of txt
---                           "Fire" -> Ninja {name=(words (x) !! 0), country = ((words (x) !! 1) !! 0), status = "Junior", exam1 = read (words (x) !! 2) :: Float, exam2 = read (words (x) !! 3) :: Float, ability1 = (words (x) !! 4), ability2 = (words (x) !! 5), r = 0} ++ fire
-
---insertNinjas :: [[Char]] -> [Ninja]
---insertNinjas lines@(x:xs) = case xs of 
---                             [x']        -> insertNinja x' 
---                             xs@(x':_)   -> insertNinjas xs
+calcScore :: ((String -> Float) -> String -> String -> Float) -> String -> String -> Float -> Float -> Float -- call another function to get values of abilities
+calcScore abilitySum a1 a2 e1 e2 = 0.5 * e1 + 0.3 * e2 + abilitySum findAbility a1 a2 
 
 insertNinjas :: [[Char]] -> [[Ninja]]
 insertNinjas lines = map insertNinja lines   --send all lines to insertNinja function
@@ -99,13 +107,14 @@ main = do
     --putStrLn (show (lineWords))
     let x = fileLines !! 1
     putStrLn (show (typeOf (x)))
-    let naruto = (Ninja {name=(words (x) !! 0), country = ((words (x) !! 1) !! 0), status = "Junior", exam1 = read (words (x) !! 2) :: Float, exam2 = read (words (x) !! 3) :: Float, ability1 = (words (x) !! 4), ability2 = (words (x) !! 5), r = 0}) : fire
+    --let naruto = (Ninja {name=(words (x) !! 0), country = ((words (x) !! 1) !! 0), status = "Junior", exam1 = read (words (x) !! 2) :: Float, exam2 = read (words (x) !! 3) :: Float, ability1 = (words (x) !! 4), ability2 = (words (x) !! 5), r = 0}) : fire
     let allLists = insertNinjas fileLines -- allLists type : [[Ninja]]
     putStrLn (show (typeOf (lightning)))
     --let lightning = (Ninja {name=(words (x) !! 0), country = ((words (x) !! 1) !! 0), status = "Junior", exam1 = read (words (x) !! 2) :: Float, exam2 = read (words (x) !! 3) :: Float, ability1 = (words (x) !! 4), ability2 = (words (x) !! 5), r = 0}) : lightning
    -- putStrLn (show (name (head (insertNinjas fileLines)))) -- şu an sadece txtnin son satırını alıyor ama lightninge de ekememiş anlamadım
-    putStrLn (show (name (head (head (tail (allLists))))))
-    putStrLn (show (name (head (head (tail (tail (tail (tail (tail (allLists))))))))))
+    putStrLn (show (name (head (head (tail (allLists)))))) -- Sasuke, fire
+    putStrLn (show (name (head (head (tail (tail (tail (tail (tail (allLists)))))))))) -- Kankuro, wind
+    putStrLn (show (name (head (head (tail (tail (tail (tail (tail (tail (allLists))))))))))) -- Midare, water
     putStrLn (show (length allLists))
     printMenu fileLines
     --putStr (name naruto)
