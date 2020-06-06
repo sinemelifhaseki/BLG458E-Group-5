@@ -61,12 +61,6 @@ insertNinja x = case (xWords !! 1) of
                    xWords = words (x)
              
 
---parseNinjas :: Char -> [Ninja] -> [Ninja]
---parseNinjas country_letter allNinjas = map parseNinja country_letter allNinjas   
-
---parseNinja :: Char -> Ninja -> Ninja
---parseNinja country_letter ninja_instance = case (country_letter, country ninja_instance) of
---                   ('n','n') -> ninja_instance
 
 ourFilter f letter [] = []
 ourFilter f letter (x:xs) 
@@ -80,21 +74,6 @@ isSameCountry :: Char -> Ninja -> Bool
 isSameCountry countryLetter ninjaInstance
      | (country ninjaInstance) == countryLetter     = True
      | otherwise                                  = False
-      
---fireAdder :: Ninja -> [Ninja]
---fireAdder temp = temp : fire
-
---windAdder :: Ninja -> [Ninja]
---windAdder temp = temp : wind
-
---waterAdder :: Ninja -> [Ninja]
---waterAdder temp = temp : water
-
---earthAdder :: Ninja -> [Ninja]
---earthAdder temp = temp : earth
-
---lightningAdder :: Ninja -> [Ninja]
---lightningAdder temp = temp : lightning
 
 
 printMenu input = do 
@@ -110,6 +89,25 @@ printMenu input = do
                      'e' -> return ()
                      _ -> putStrLn "Invalid choice, choose again." >> printMenu input
 
+--compareAbilities :: Ninja -> Ninja -> Bool
+--compareAbilities ninja1 ninja2
+--   | (ability1 ninja1 + ability2 ninja1 ) > 
+
+compareScores :: Ninja -> Ninja -> Bool
+compareScores ninja1 ninja2 
+   | score ninja1 > score ninja2  = True
+   | otherwise                    = False
+
+sortNinjas :: Ninja -> [Ninja] -> [Ninja]
+sortNinjas ninja [] = [ninja]
+sortNinjas ninja xs@(x':xs') 
+   | r ninja < r x'                                = ninja : xs    
+   | (r ninja == r x') && compareScores ninja x'   = ninja : xs
+   | otherwise                                             = x' : sortNinjas ninja xs'
+
+nSort :: [Ninja] -> [Ninja]
+nSort [] = []
+nSort (x:xs) = sortNinjas x (nSort xs)
 
 main = do
     args <- getArgs -- IO [String]
@@ -126,12 +124,24 @@ main = do
     let lightning = parseNinjas 'L' allLists
     let water = parseNinjas 'W' allLists
     let wind = parseNinjas 'n' allLists
-    putStrLn (show (name (head (tail (wind)))))
-    putStrLn (show (name (head (tail (fire)))))
-    putStrLn (show (name (head (tail (lightning)))))
-    putStrLn (show (name (head (tail (earth)))))    
-    putStrLn (show (name (head (tail (water)))))
-    putStrLn (show (typeOf (lightning)))
+    putStrLn (show ("Beni gorun:"))
+    putStrLn (show (name (head (nSort allLists)))) -- sasuke
+    putStrLn (show (name (head (tail (nSort allLists))))) -- gaara 
+    putStrLn (show (name (head (tail (tail (nSort allLists)))))) -- sana
+    putStrLn (show (name (head (tail (tail (tail (nSort allLists))))))) -- naruto
+    putStrLn (show (name (head (tail (tail (tail (tail (nSort allLists)))))))) -- aimi 
+    putStrLn (show (name (head (tail (tail (tail (tail (tail (nSort allLists))))))))) -- suiu
+    putStrLn (show (name (head (tail (tail (tail (tail (tail (tail (nSort allLists)))))))))) -- haruki
+    putStrLn (show (name (head (tail (tail (tail (tail (tail (tail (tail (nSort allLists))))))))))) -- neiji 
+    putStrLn (show (name (head (tail (tail (tail (tail (tail (tail (tail (tail (nSort allLists)))))))))))) -- samidare
+    putStrLn (show (name (head (tail (tail (tail (tail (tail (tail (tail (tail (tail (nSort allLists))))))))))))) --midare
+    putStrLn (show ("Beni gordunuz:"))
+    --putStrLn (show (name (head (tail (wind)))))
+    --putStrLn (show (name (head (tail (fire)))))
+    --putStrLn (show (name (head (tail (lightning)))))
+    --putStrLn (show (name (head (tail (earth)))))    
+    --putStrLn (show (name (head (tail (water)))))
+    --putStrLn (show (typeOf (lightning)))
     --let lightning = (Ninja {name=(words (x) !! 0), country = ((words (x) !! 1) !! 0), status = "Junior", exam1 = read (words (x) !! 2) :: Float, exam2 = read (words (x) !! 3) :: Float, ability1 = (words (x) !! 4), ability2 = (words (x) !! 5), r = 0}) : lightning
    -- putStrLn (show (name (head (insertNinjas fileLines)))) -- şu an sadece txtnin son satırını alıyor ama lightninge de ekememiş anlamadım
     putStrLn (show (score  (head (tail (allLists))))) -- Sasuke, fire, 133
