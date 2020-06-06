@@ -52,12 +52,10 @@ insertNinja x = case (xWords !! 1) of
                   "Lightning" -> (Ninja {name=(xWords !! 0), country = ((xWords !! 1) !! 0), status = "Junior", exam1 = read (xWords !! 2) :: Float, exam2 = read (xWords !! 3) :: Float, ability1 = (xWords !! 4), ability2 = (xWords !! 5), r = 0, score = calcScore abilitySum (xWords !! 4) (xWords !! 5) (read (xWords !! 2)::Float) (read (xWords !! 3)::Float)})
                          
                   "Water" -> (Ninja {name=(xWords !! 0), country = ((xWords !! 1) !! 0), status = "Junior", exam1 = read (xWords !! 2) :: Float, exam2 = read (xWords !! 3) :: Float, ability1 = (xWords !! 4), ability2 = (xWords !! 5), r = 0, score = calcScore abilitySum (xWords !! 4) (xWords !! 5) (read (xWords !! 2)::Float) (read (xWords !! 3)::Float)})
-
                          
                   "Wind"  -> (Ninja {name=(xWords !! 0), country = ((xWords !! 1) !! 2), status = "Junior", exam1 = read (xWords !! 2) :: Float, exam2 = read (xWords !! 3) :: Float, ability1 = (xWords !! 4), ability2 = (xWords !! 5), r = 0, score = calcScore abilitySum (xWords !! 4) (xWords !! 5) (read (xWords !! 2)::Float) (read (xWords !! 3)::Float)})
 
                   "Earth" -> (Ninja {name=(xWords !! 0), country = ((xWords !! 1) !! 0), status = "Junior", exam1 = read (xWords !! 2) :: Float, exam2 = read (xWords !! 3) :: Float, ability1 = (xWords !! 4), ability2 = (xWords !! 5), r = 0, score = calcScore abilitySum (xWords !! 4) (xWords !! 5) (read (xWords !! 2)::Float) (read (xWords !! 3)::Float)})
-
                          
                 where 
                    xWords = words (x)
@@ -70,7 +68,18 @@ insertNinja x = case (xWords !! 1) of
 --parseNinja country_letter ninja_instance = case (country_letter, country ninja_instance) of
 --                   ('n','n') -> ninja_instance
 
-                   
+ourFilter f letter [] = []
+ourFilter f letter (x:xs) 
+    | f letter x        = x : ourFilter f letter xs
+    | otherwise         = ourFilter f letter xs
+
+parseNinjas :: Char -> [Ninja] -> [Ninja]
+parseNinjas countryLetter allNinjas = ourFilter isSameCountry countryLetter allNinjas 
+
+isSameCountry :: Char -> Ninja -> Bool
+isSameCountry countryLetter ninjaInstance
+     | (country ninjaInstance) == countryLetter     = True
+     | otherwise                                  = False
       
 --fireAdder :: Ninja -> [Ninja]
 --fireAdder temp = temp : fire
@@ -111,8 +120,17 @@ main = do
     let x = fileLines !! 1
     putStrLn (show (typeOf (x)))
     --let naruto = (Ninja {name=(words (x) !! 0), country = ((words (x) !! 1) !! 0), status = "Junior", exam1 = read (words (x) !! 2) :: Float, exam2 = read (words (x) !! 3) :: Float, ability1 = (words (x) !! 4), ability2 = (words (x) !! 5), r = 0}) : fire
-    let allLists = insertNinjas fileLines -- allLists type : [[Ninja]]
-
+    let allLists = insertNinjas fileLines -- allLists type : [[Ninja]] 
+    let fire = parseNinjas 'F' allLists
+    let earth = parseNinjas 'E' allLists
+    let lightning = parseNinjas 'L' allLists
+    let water = parseNinjas 'W' allLists
+    let wind = parseNinjas 'n' allLists
+    putStrLn (show (name (head (tail (wind)))))
+    putStrLn (show (name (head (tail (fire)))))
+    putStrLn (show (name (head (tail (lightning)))))
+    putStrLn (show (name (head (tail (earth)))))    
+    putStrLn (show (name (head (tail (water)))))
     putStrLn (show (typeOf (lightning)))
     --let lightning = (Ninja {name=(words (x) !! 0), country = ((words (x) !! 1) !! 0), status = "Junior", exam1 = read (words (x) !! 2) :: Float, exam2 = read (words (x) !! 3) :: Float, ability1 = (words (x) !! 4), ability2 = (words (x) !! 5), r = 0}) : lightning
    -- putStrLn (show (name (head (insertNinjas fileLines)))) -- şu an sadece txtnin son satırını alıyor ama lightninge de ekememiş anlamadım
