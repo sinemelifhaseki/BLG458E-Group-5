@@ -2,7 +2,7 @@ import System.Environment
 import Data.List
 import Data.Typeable
 import System.IO
-
+import Data.Char
 
 data Ninja = Ninja {name:: String, country:: Char, status:: String, exam1:: Float, exam2:: Float, ability1:: String, ability2:: String, r:: Int, score:: Float} deriving Show
 --status initialized as junior --> will be upgraded to journeyman
@@ -53,7 +53,7 @@ insertNinja x = case (xWords !! 1) of
                          
                   "Water" -> (Ninja {name=(xWords !! 0), country = ((xWords !! 1) !! 0), status = "Junior", exam1 = read (xWords !! 2) :: Float, exam2 = read (xWords !! 3) :: Float, ability1 = (xWords !! 4), ability2 = (xWords !! 5), r = 0, score = calcScore abilitySum (xWords !! 4) (xWords !! 5) (read (xWords !! 2)::Float) (read (xWords !! 3)::Float)})
                          
-                  "Wind"  -> (Ninja {name=(xWords !! 0), country = ((xWords !! 1) !! 2), status = "Junior", exam1 = read (xWords !! 2) :: Float, exam2 = read (xWords !! 3) :: Float, ability1 = (xWords !! 4), ability2 = (xWords !! 5), r = 0, score = calcScore abilitySum (xWords !! 4) (xWords !! 5) (read (xWords !! 2)::Float) (read (xWords !! 3)::Float)})
+                  "Wind"  -> (Ninja {name=(xWords !! 0), country = toUpper ((xWords !! 1) !! 2), status = "Junior", exam1 = read (xWords !! 2) :: Float, exam2 = read (xWords !! 3) :: Float, ability1 = (xWords !! 4), ability2 = (xWords !! 5), r = 0, score = calcScore abilitySum (xWords !! 4) (xWords !! 5) (read (xWords !! 2)::Float) (read (xWords !! 3)::Float)})
 
                   "Earth" -> (Ninja {name=(xWords !! 0), country = ((xWords !! 1) !! 0), status = "Junior", exam1 = read (xWords !! 2) :: Float, exam2 = read (xWords !! 3) :: Float, ability1 = (xWords !! 4), ability2 = (xWords !! 5), r = 0, score = calcScore abilitySum (xWords !! 4) (xWords !! 5) (read (xWords !! 2)::Float) (read (xWords !! 3)::Float)})
                          
@@ -72,7 +72,7 @@ parseNinjas countryLetter allNinjas = ourFilter isSameCountry countryLetter allN
 isSameCountry :: Char -> Ninja -> Bool
 isSameCountry countryLetter ninjaInstance
      | (country ninjaInstance) == countryLetter     = True
-     | otherwise                                  = False
+     | otherwise                                    = False
 
 
 printMenu input = do 
@@ -81,7 +81,16 @@ printMenu input = do
               putStrLn "Enter the choice:"
               choice <- getLine
               case head choice of
-                     --'a' -> insertNinjas input >>= printMenu
+                     'a' -> do
+                          putStrLn "Enter the country code: "
+                          cCode <- getLine
+                          let allLists = insertNinjas input -- allLists type : [[Ninja]] 
+                          let countryList = parseNinjas (toUpper (head cCode)) allLists
+                          putStrLn ""
+                          printNinjas (nSort countryList)
+                          putStrLn "" >> printMenu input
+                          
+                     --insertNinjas input >>= printMenu
                      'b' -> do 
                           let allLists = insertNinjas input -- allLists type : [[Ninja]] 
                           let fire = parseNinjas 'F' allLists
@@ -92,14 +101,42 @@ printMenu input = do
                           putStrLn ""
                           printNinjas (mergeNinjas fire earth lightning water wind)
                           putStrLn "" >> printMenu input
-                     --'c' ->
+                     'c' -> do
+                          putStrLn "Enter the name of first ninja: "
+                          name1 <- getLine
+                          putStrLn "Enter the country code of first ninja: "
+                          cCode1 <- getLine
+                          putStrLn "Enter the name of second ninja: "
+                          name2 <- getLine
+                          putStrLn "Enter the country code of second ninja: "
+                          cCode2 <- getLine
+                          let countryList1 = parseNinjas (toUpper (head cCode1)) allLists
+                          let countryList2 = parseNinjas (toUpper (head cCode2)) allLists
+                          
                      --'d' ->
                      'e' -> return ()
                      _ -> putStrLn "Invalid choice, choose again." >> printMenu input
 
---compareAbilities :: Ninja -> Ninja -> Bool
---compareAbilities ninja1 ninja2
---   | (ability1 ninja1 + ability2 ninja1 ) > 
+findNinja :: [Ninja] -> [Char] -> Ninja
+findNinja ninjaList@(x:xs) nameWanted 
+   | name x == nameWanted = x
+   | otherwise            = findNinja xs nameWanted
+
+makeFight :: ([Ninja] -> [Char] -> Ninja) -> [Ninja] -> [Ninja] -> [Char] -> [Char] -> ([Ninja],[Ninja])
+makeFight findNinja nList1 nList2 name1 name2
+   | score (findNinja nList1 name1) > score (findNinja nList2 name2) = updateLists 1 nList1 nList2
+   | score (findNinja nList1 name1) < score (findNinja nList2 name2) = updateLists 2 nList1 nList2
+   | (score (findNinja nList1 name1) == score (findNinja nList2 name2)) && compareAbilities (findNinja nList1 name1) (findNinja nList2 name2) = updateLists 1 nList1 nList2
+   | (score (findNinja nList1 name1) == score (findNinja nList2 name2)) && compareAbilities (findNinja nList2 name2) (findNinja nList1 name1) = updateLists 2 nList1 nList2
+   | otherwise                                                                                                                                = updateLists (getRandom `mod` 2 + 1)  nList1 nList2
+
+compareAbilities :: Ninja -> Ninja -> Bool
+compareAbilities ninja1 ninja2
+   | (ability1 ninja1 + ability2 ninja1 ) > (ability1 ninja2 + ability2 ninja2 ) = True
+   | otherwise                                                                   = False
+
+
+---------UPDATE: round artır diskalifiye et skor ekle oluşan listeleri döndür---> updateLists fonksiyonunu yaz
 
 compareScores :: Ninja -> Ninja -> Bool
 compareScores ninja1 ninja2 
@@ -140,42 +177,5 @@ main = do
     args <- getArgs -- IO [String]
     content <- readFile (args !! 0)
     let fileLines = lines content -- fileLines type: [[Char]]
-    --let lineWords = words (fileLines !! 1)
-    --putStrLn (show (lineWords))
     let x = fileLines !! 1
-    --putStrLn (show (typeOf (x)))
-    --let naruto = (Ninja {name=(words (x) !! 0), country = ((words (x) !! 1) !! 0), status = "Junior", exam1 = read (words (x) !! 2) :: Float, exam2 = read (words (x) !! 3) :: Float, ability1 = (words (x) !! 4), ability2 = (words (x) !! 5), r = 0}) : fire
-    --let allLists = insertNinjas fileLines -- allLists type : [[Ninja]] 
-    --let fire = parseNinjas 'F' allLists
-    --let earth = parseNinjas 'E' allLists
-    --let lightning = parseNinjas 'L' allLists
-    --let water = parseNinjas 'W' allLists
-    --let wind = parseNinjas 'n' allLists
-    --putStrLn (show ("Beni gorun:"))
-    --printNinjas (mergeNinjas fire earth lightning water wind)
-    --putStrLn (show (name (head (mergeNinjas fire earth lightning water wind)))) -- sasuke
-    --putStrLn (show (name (head (tail (mergeNinjas fire earth lightning water wind))))) -- gaara 
-    --putStrLn (show (name (head (tail (tail (mergeNinjas fire earth lightning water wind)))))) -- sana
-    --putStrLn (show (name (head (tail (tail (tail (mergeNinjas fire earth lightning water wind))))))) -- naruto
-    --putStrLn (show (name (head (tail (tail (tail (tail (mergeNinjas fire earth lightning water wind)))))))) -- aimi 
-    --putStrLn (show (name (head (tail (tail (tail (tail (tail (mergeNinjas fire earth lightning water wind))))))))) -- suiu
-    --putStrLn (show (name (head (tail (tail (tail (tail (tail (tail (mergeNinjas fire earth lightning water wind)))))))))) -- haruki
-    --putStrLn (show (name (head (tail (tail (tail (tail (tail (tail (tail (mergeNinjas fire earth lightning water wind))))))))))) -- neiji 
-    --putStrLn (show (name (head (tail (tail (tail (tail (tail (tail (tail (tail (mergeNinjas fire earth lightning water wind)))))))))))) -- samidare
-    --putStrLn (show (name (head (tail (tail (tail (tail (tail (tail (tail (tail (tail (mergeNinjas fire earth lightning water wind))))))))))))) --midare
-    --putStrLn (show ("Beni gordunuz:"))
-    --putStrLn (show (name (head (tail (wind)))))
-    --putStrLn (show (name (head (tail (fire)))))
-    --putStrLn (show (name (head (tail (lightning)))))
-    --putStrLn (show (name (head (tail (earth)))))    
-    --putStrLn (show (name (head (tail (water)))))
-    --putStrLn (show (typeOf (lightning)))
-    --let lightning = (Ninja {name=(words (x) !! 0), country = ((words (x) !! 1) !! 0), status = "Junior", exam1 = read (words (x) !! 2) :: Float, exam2 = read (words (x) !! 3) :: Float, ability1 = (words (x) !! 4), ability2 = (words (x) !! 5), r = 0}) : lightning
-   -- putStrLn (show (name (head (insertNinjas fileLines)))) -- şu an sadece txtnin son satırını alıyor ama lightninge de ekememiş anlamadım
-    --putStrLn (show (score  (head (tail (allLists))))) -- Sasuke, fire, 133
-    --putStrLn (show (score  (head (tail (tail (tail (tail (tail (allLists))))))))) -- Kankuro, wind
-    --putStrLn (show (score  (head (tail (tail (tail (tail (tail (tail (allLists)))))))))) -- Midare, water
-    --putStrLn (show (length allLists))
     printMenu fileLines
-    --putStr (name naruto)
-    --putStrLn (show (length lise))
