@@ -77,50 +77,8 @@ isSameCountry countryLetter ninjaInstance
      | (country ninjaInstance) == countryLetter     = True
      | otherwise                                    = False
 
---updateLists :: Int -> [Char] -> [Char] -> [Ninja] -> [Ninja] -> ([Ninja],[Ninja]) 
---updateLists winner name1 name2 nList1 nList2
---   | winner == 1            = do
-                                 --let winner_ninja = findNinja nList1 name1
-                                 --let new_score = score winner_ninja + 10
-                                 --let new_round = r winner_ninja + 1
-                                 --let loser_ninja = findNinja nList2 name2
-                                 --if new_round >= 3
-                                 --then do 
-                                           --let new_ninja = (Ninja {name = (name winner_ninja), country = (country winner_ninja), status = "JourneyMan", exam1 = (exam1 winner_ninja), exam2 = (exam2 winner_ninja), ability1 = (ability1 winner_ninja), ability2 = (ability2 winner_ninja), r = new_round, score = new_score})
-                                           --let nList1_temp = removeNinja winner_ninja nList1
-                                           --let nList1_temp2 = pushList new_ninja nList1_temp
-                                           --let nList2_temp = removeNinja loser_ninja nList2
-                                           --(nList1_temp2, nList2_temp) 
-                                 --else do
-                                              --let new_ninja = (Ninja {name = (name winner_ninja), country = (country winner_ninja), status = "Junior", exam1 = (exam1 winner_ninja), exam2 = (exam2 winner_ninja), ability1 = (ability1 winner_ninja), ability2 = (ability2 winner_ninja), r = new_round, score = new_score})
-                                              --let nList1_temp = removeNinja winner_ninja nList1
-                                              --let nList1_temp2 = pushList new_ninja nList1_temp
-                                              --let nList2_temp = removeNinja loser_ninja nList2
-                                              --(nList1_temp2, nList2_temp)
 
-   
---   | winner == 2            = do
-                                 --let winner_ninja = findNinja nList2 name2
-                                 --let new_score = score winner_ninja + 10
-                                 --let new_round = r winner_ninja + 1
-                                 --let loser_ninja = findNinja nList1 name1
-                                 --if new_round >= 3
-                                     --then do 
-                                             --let new_ninja = (Ninja {name = (name winner_ninja), country = (country winner_ninja), status = "JourneyMan", exam1 = (exam1 winner_ninja), exam2 = (exam2 winner_ninja), ability1 = (ability1 winner_ninja), ability2 = (ability2 winner_ninja), r = new_round, score = new_score})
-                                             --let nList2_temp = removeNinja winner_ninja nList2
-                                             --let nList2_temp2 = pushList new_ninja nList2_temp
-                                             --let nList1_temp = removeNinja loser_ninja nList1
-                                             --(nList1_temp, nList2_temp2)
-                                 --else do
-                                             --let new_ninja = (Ninja {name = (name winner_ninja), country = (country winner_ninja), status = "Junior", exam1 = (exam1 winner_ninja), exam2 = (exam2 winner_ninja), ability1 = (ability1 winner_ninja), ability2 = (ability2 winner_ninja), r = new_round, score = new_score})
-                                             --let nList2_temp = removeNinja winner_ninja nList2
-                                             --let nList2_temp2 = pushList new_ninja nList2_temp
-                                             --let nList1_temp = removeNinja loser_ninja nList1
-                                             --(nList1_temp, nList2_temp2)
-
-
-
-printMenu input = do 
+printMenu allLists = do  
               putStrLn "a) View a Country's Ninja Information\nb) View All Countries' Ninja Information"
               putStrLn "c) Make a Round Between Ninjas\nd) Make a Round Between Countries\ne)Exit"
               putStrLn "Enter the choice:"
@@ -129,15 +87,13 @@ printMenu input = do
                      'a' -> do
                           putStrLn "Enter the country code: "
                           cCode <- getLine
-                          let allLists = insertNinjas input -- allLists type : [[Ninja]] 
+                          --let allLists = insertNinjas input -- allLists type : [[Ninja]] 
                           let countryList = parseNinjas (toUpper (head cCode)) allLists
                           putStrLn ""
                           printNinjas (nSort countryList)
-                          putStrLn "" >> printMenu input
-                          
-                     --insertNinjas input >>= printMenu
+                          putStrLn "" >> printMenu allLists
                      'b' -> do 
-                          let allLists = insertNinjas input -- allLists type : [[Ninja]] 
+                          --let allLists = insertNinjas input -- allLists type : [[Ninja]] 
                           let fire = parseNinjas 'F' allLists
                           let earth = parseNinjas 'E' allLists
                           let lightning = parseNinjas 'L' allLists
@@ -145,7 +101,7 @@ printMenu input = do
                           let wind = parseNinjas 'n' allLists
                           putStrLn ""
                           printNinjas (mergeNinjas fire earth lightning water wind)
-                          putStrLn "" >> printMenu input
+                          putStrLn "" >> printMenu allLists
                      'c' -> do
                           putStrLn "Enter the name of first ninja: "
                           name1 <- getLine
@@ -155,18 +111,132 @@ printMenu input = do
                           name2 <- getLine
                           putStrLn "Enter the country code of second ninja: "
                           cCode2 <- getLine
-                          let allLists = insertNinjas input -- allLists type : [[Ninja]]
-                          let countryList1 = parseNinjas (toUpper (head cCode1)) allLists
-                          let countryList2 = parseNinjas (toUpper (head cCode2)) allLists
-                          -- fonksiyon buraya gelcekti
+                          --let allLists = insertNinjas input -- allLists type : [[Ninja]]
+                          let countryList1 = nSort (parseNinjas (toUpper (head cCode1)) allLists)
+                          let countryList2 = nSort (parseNinjas (toUpper (head cCode2)) allLists)
                           let ninjaLists = makeFight findNinja countryList1 countryList2 name1 name2
                           putStr "Winner: "
                           printNinja (head (fst ninjaLists))
-                          putStrLn "" >> printMenu input
-                          -- burada bir hata veriyor sanırım anlamadım
-                     --'d' ->
+                          putStrLn "" >> printMenu (findRemainingLists (toUpper (head cCode1)) (toUpper (head cCode2)) allLists (fst ninjaLists) (snd ninjaLists)) -- burada inputu güncellememiz gerekecek sanırım
+                           
+                     'd' -> do
+                          putStrLn "Enter the country code of first ninja: "
+                          cCode1 <- getLine
+                          putStrLn "Enter the country code of second ninja: "
+                          cCode2 <- getLine
+                          --let allLists = insertNinjas input -- allLists type : [[Ninja]]
+                          let countryList1 = nSort (parseNinjas (toUpper (head cCode1)) allLists)
+                          let countryList2 = nSort (parseNinjas (toUpper (head cCode2)) allLists)
+                          let ninjaLists = makeFight findNinja countryList1 countryList2 (name (head countryList1)) (name (head countryList2))
+                          putStr "Winner: "
+                          printNinja2 (head (fst ninjaLists))
+                          putStrLn "" >> printMenu (findRemainingLists (toUpper (head cCode1)) (toUpper (head cCode2)) allLists (fst ninjaLists) (snd ninjaLists)) -- burada inputu güncellememiz gerekecek sanırım
                      'e' -> return ()
-                     _ -> putStrLn "Invalid choice, choose again." >> printMenu input
+                     _ -> putStrLn "Invalid choice, choose again." >> printMenu allLists
+
+findRemainingLists :: Char -> Char -> [Ninja] -> [Ninja] -> [Ninja] -> [Ninja]
+findRemainingLists first second allLists list1 list2 = case (first,second) of
+        ('F', 'W') ->  do --fire earth lightning water wind
+                          let earth = parseNinjas 'E' allLists
+                          let lightning = parseNinjas 'L' allLists
+                          let water = parseNinjas 'W' allLists
+                          mergeNinjas list1 earth lightning list2 wind
+        ('F', 'E') ->  do --fire earth lightning water wind
+                          let wind = parseNinjas 'N' allLists
+                          let lightning = parseNinjas 'L' allLists
+                          let water = parseNinjas 'W' allLists
+                          mergeNinjas list1 list2 lightning water wind
+        ('F', 'L') ->  do --fire earth lightning water wind
+                          let earth = parseNinjas 'E' allLists
+                          let wind = parseNinjas 'N' allLists
+                          let water = parseNinjas 'W' allLists
+                          mergeNinjas list1 earth list2 water wind
+        ('F', 'N') ->  do --fire earth lightning water wind
+                          let earth = parseNinjas 'E' allLists
+                          let lightning = parseNinjas 'L' allLists
+                          let water = parseNinjas 'W' allLists
+                          mergeNinjas list1 earth lightning water list2
+        ('E', 'W') ->  do --fire earth lightning water wind
+                          let fire = parseNinjas 'F' allLists
+                          let lightning = parseNinjas 'L' allLists
+                          let wind = parseNinjas 'N' allLists
+                          mergeNinjas fire list1 lightning list2 wind
+        ('E', 'L') ->  do --fire earth lightning water wind
+                          let fire = parseNinjas 'F' allLists
+                          let wind = parseNinjas 'N' allLists
+                          let water = parseNinjas 'W' allLists
+                          mergeNinjas fire list1 list2 water wind
+        ('E', 'N') ->  do --fire earth lightning water wind
+                          let fire = parseNinjas 'F' allLists
+                          let lightning = parseNinjas 'L' allLists
+                          let water = parseNinjas 'W' allLists
+                          mergeNinjas fire list1 lightning water list2
+        ('L', 'W') ->  do --fire earth lightning water wind
+                          let fire = parseNinjas 'F' allLists
+                          let earth = parseNinjas 'E' allLists
+                          let wind = parseNinjas 'N' allLists
+                          mergeNinjas fire earth list1 list2 wind
+        ('L', 'N') ->  do --fire earth lightning water wind
+                          let earth = parseNinjas 'E' allLists
+                          let fire = parseNinjas 'F' allLists
+                          let water = parseNinjas 'W' allLists
+                          mergeNinjas list1 earth lightning water list2
+        ('W', 'N') ->  do --fire earth lightning water wind
+                          let earth = parseNinjas 'E' allLists
+                          let lightning = parseNinjas 'L' allLists
+                          let fire = parseNinjas 'F' allLists
+                          mergeNinjas fire earth lightning list1 list2
+        ('W', 'F') ->  do --fire earth lightning water wind
+                          let earth = parseNinjas 'E' allLists
+                          let lightning = parseNinjas 'L' allLists
+                          let water = parseNinjas 'W' allLists
+                          mergeNinjas list1 earth lightning list2 wind
+        ('E', 'F') ->  do --fire earth lightning water wind
+                          let wind = parseNinjas 'N' allLists
+                          let lightning = parseNinjas 'L' allLists
+                          let water = parseNinjas 'W' allLists
+                          mergeNinjas list1 list2 lightning water wind
+        ('L', 'F') ->  do --fire earth lightning water wind
+                          let earth = parseNinjas 'E' allLists
+                          let wind = parseNinjas 'N' allLists
+                          let water = parseNinjas 'W' allLists
+                          mergeNinjas list1 earth list2 water wind
+        ('N', 'F') ->  do --fire earth lightning water wind
+                          let earth = parseNinjas 'E' allLists
+                          let lightning = parseNinjas 'L' allLists
+                          let water = parseNinjas 'W' allLists
+                          mergeNinjas list1 earth lightning water list2
+        ('W', 'E') ->  do --fire earth lightning water wind
+                          let fire = parseNinjas 'F' allLists
+                          let lightning = parseNinjas 'L' allLists
+                          let wind = parseNinjas 'N' allLists
+                          mergeNinjas fire list1 lightning list2 wind
+        ('L', 'E') ->  do --fire earth lightning water wind
+                          let fire = parseNinjas 'F' allLists
+                          let wind = parseNinjas 'N' allLists
+                          let water = parseNinjas 'W' allLists
+                          mergeNinjas fire list1 list2 water wind
+        ('N', 'E') ->  do --fire earth lightning water wind
+                          let fire = parseNinjas 'F' allLists
+                          let lightning = parseNinjas 'L' allLists
+                          let water = parseNinjas 'W' allLists
+                          mergeNinjas fire list1 lightning water list2
+        ('W', 'L') ->  do --fire earth lightning water wind
+                          let fire = parseNinjas 'F' allLists
+                          let earth = parseNinjas 'E' allLists
+                          let wind = parseNinjas 'N' allLists
+                          mergeNinjas fire earth list1 list2 wind
+        ('N', 'L') ->  do --fire earth lightning water wind
+                          let earth = parseNinjas 'E' allLists
+                          let fire = parseNinjas 'F' allLists
+                          let water = parseNinjas 'W' allLists
+                          mergeNinjas list1 earth lightning water list2
+        ('N', 'W') ->  do --fire earth lightning water wind
+                          let earth = parseNinjas 'E' allLists
+                          let lightning = parseNinjas 'L' allLists
+                          let fire = parseNinjas 'F' allLists
+                          mergeNinjas fire earth lightning list1 list2
+
 
 findNinja :: [Ninja] -> [Char] -> Ninja
 findNinja ninjaList@(x:xs) nameWanted 
@@ -186,11 +256,6 @@ compareAbilities ninja1 ninja2
    | (abilitySum findAbility (ability1 ninja1) (ability2 ninja1)) > (abilitySum findAbility (ability1 ninja2) (ability2 ninja2))  = True
    | otherwise                                                                                                                    = False
 
-
----------UPDATE: round artır diskalifiye et skor ekle oluşan listeleri döndür---> updateLists fonksiyonunu yaz
-
-
---- ozgun ekledi -----------------------------------------------------------------------------------------------------------------------
 
 updateLists :: Int -> [Char] -> [Char] -> [Ninja] -> [Ninja] -> ([Ninja],[Ninja]) 
 updateLists winner name1 name2 nList1 nList2
@@ -281,10 +346,18 @@ printNinja ninja = do
             putStr (show (r ninja))
             putStrLn ""
             
+printNinja2 :: Ninja -> IO ()
+printNinja2 ninja = do 
+            putStr (show (name ninja))
+            putStr (", Round: ")
+            putStr (show (r ninja))
+            putStr (", Status: ")
+            putStr (show (status ninja))
+            putStrLn "" 
  
 main = do
     args <- getArgs -- IO [String]
     content <- readFile (args !! 0)
     let fileLines = lines content -- fileLines type: [[Char]]
-    let x = fileLines !! 1
-    printMenu fileLines
+    let allLists = insertNinjas fileLines
+    printMenu allLists
