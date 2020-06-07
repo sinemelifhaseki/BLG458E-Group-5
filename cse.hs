@@ -74,46 +74,46 @@ isSameCountry countryLetter ninjaInstance
      | (country ninjaInstance) == countryLetter     = True
      | otherwise                                    = False
 
-updateLists :: Int -> [Char] -> [Char] -> [Ninja] -> [Ninja] -> ([Ninja],[Ninja]) 
-updateLists winner name1 name2 nList1 nList2
-   | winner == 1            = do
-                                 let winner_ninja = findNinja nList1 name1
-                                 let new_score = score winner_ninja + 10
-                                 let new_round = r winner_ninja + 1
-                                 let loser_ninja = findNinja nList2 name2
-                                 if new_round >= 3
-                                 then do 
-                                           let new_ninja = (Ninja {name = (name winner_ninja), country = (country winner_ninja), status = "JourneyMan", exam1 = (exam1 winner_ninja), exam2 = (exam2 winner_ninja), ability1 = (ability1 winner_ninja), ability2 = (ability2 winner_ninja), r = new_round, score = new_score})
-                                           let nList1_temp = removeNinja winner_ninja nList1
-                                           let nList1_temp2 = pushList new_ninja nList1_temp
-                                           let nList2_temp = removeNinja loser_ninja nList2
-                                           (nList1_temp2, nList2_temp) 
-                                 else do
-                                              let new_ninja = (Ninja {name = (name winner_ninja), country = (country winner_ninja), status = "Junior", exam1 = (exam1 winner_ninja), exam2 = (exam2 winner_ninja), ability1 = (ability1 winner_ninja), ability2 = (ability2 winner_ninja), r = new_round, score = new_score})
-                                              let nList1_temp = removeNinja winner_ninja nList1
-                                              let nList1_temp2 = pushList new_ninja nList1_temp
-                                              let nList2_temp = removeNinja loser_ninja nList2
-                                              (nList1_temp2, nList2_temp)
+--updateLists :: Int -> [Char] -> [Char] -> [Ninja] -> [Ninja] -> ([Ninja],[Ninja]) 
+--updateLists winner name1 name2 nList1 nList2
+--   | winner == 1            = do
+                                 --let winner_ninja = findNinja nList1 name1
+                                 --let new_score = score winner_ninja + 10
+                                 --let new_round = r winner_ninja + 1
+                                 --let loser_ninja = findNinja nList2 name2
+                                 --if new_round >= 3
+                                 --then do 
+                                           --let new_ninja = (Ninja {name = (name winner_ninja), country = (country winner_ninja), status = "JourneyMan", exam1 = (exam1 winner_ninja), exam2 = (exam2 winner_ninja), ability1 = (ability1 winner_ninja), ability2 = (ability2 winner_ninja), r = new_round, score = new_score})
+                                           --let nList1_temp = removeNinja winner_ninja nList1
+                                           --let nList1_temp2 = pushList new_ninja nList1_temp
+                                           --let nList2_temp = removeNinja loser_ninja nList2
+                                           --(nList1_temp2, nList2_temp) 
+                                 --else do
+                                              --let new_ninja = (Ninja {name = (name winner_ninja), country = (country winner_ninja), status = "Junior", exam1 = (exam1 winner_ninja), exam2 = (exam2 winner_ninja), ability1 = (ability1 winner_ninja), ability2 = (ability2 winner_ninja), r = new_round, score = new_score})
+                                              --let nList1_temp = removeNinja winner_ninja nList1
+                                              --let nList1_temp2 = pushList new_ninja nList1_temp
+                                              --let nList2_temp = removeNinja loser_ninja nList2
+                                              --(nList1_temp2, nList2_temp)
 
    
-   | winner == 2            = do
-                                 let winner_ninja = findNinja nList2 name2
-                                 let new_score = score winner_ninja + 10
-                                 let new_round = r winner_ninja + 1
-                                 let loser_ninja = findNinja nList1 name1
-                                 if new_round >= 3
-                                     then do 
-                                             let new_ninja = (Ninja {name = (name winner_ninja), country = (country winner_ninja), status = "JourneyMan", exam1 = (exam1 winner_ninja), exam2 = (exam2 winner_ninja), ability1 = (ability1 winner_ninja), ability2 = (ability2 winner_ninja), r = new_round, score = new_score})
-                                             let nList2_temp = removeNinja winner_ninja nList2
-                                             let nList2_temp2 = pushList new_ninja nList2_temp
-                                             let nList1_temp = removeNinja loser_ninja nList1
-                                             (nList1_temp, nList2_temp2)
-                                 else do
-                                             let new_ninja = (Ninja {name = (name winner_ninja), country = (country winner_ninja), status = "Junior", exam1 = (exam1 winner_ninja), exam2 = (exam2 winner_ninja), ability1 = (ability1 winner_ninja), ability2 = (ability2 winner_ninja), r = new_round, score = new_score})
-                                             let nList2_temp = removeNinja winner_ninja nList2
-                                             let nList2_temp2 = pushList new_ninja nList2_temp
-                                             let nList1_temp = removeNinja loser_ninja nList1
-                                             (nList1_temp, nList2_temp2)
+--   | winner == 2            = do
+                                 --let winner_ninja = findNinja nList2 name2
+                                 --let new_score = score winner_ninja + 10
+                                 --let new_round = r winner_ninja + 1
+                                 --let loser_ninja = findNinja nList1 name1
+                                 --if new_round >= 3
+                                     --then do 
+                                             --let new_ninja = (Ninja {name = (name winner_ninja), country = (country winner_ninja), status = "JourneyMan", exam1 = (exam1 winner_ninja), exam2 = (exam2 winner_ninja), ability1 = (ability1 winner_ninja), ability2 = (ability2 winner_ninja), r = new_round, score = new_score})
+                                             --let nList2_temp = removeNinja winner_ninja nList2
+                                             --let nList2_temp2 = pushList new_ninja nList2_temp
+                                             --let nList1_temp = removeNinja loser_ninja nList1
+                                             --(nList1_temp, nList2_temp2)
+                                 --else do
+                                             --let new_ninja = (Ninja {name = (name winner_ninja), country = (country winner_ninja), status = "Junior", exam1 = (exam1 winner_ninja), exam2 = (exam2 winner_ninja), ability1 = (ability1 winner_ninja), ability2 = (ability2 winner_ninja), r = new_round, score = new_score})
+                                             --let nList2_temp = removeNinja winner_ninja nList2
+                                             --let nList2_temp2 = pushList new_ninja nList2_temp
+                                             --let nList1_temp = removeNinja loser_ninja nList1
+                                             --(nList1_temp, nList2_temp2)
 
 
 
@@ -231,10 +231,12 @@ updateLists winner name1 name2 nList1 nList2
                                              (nList1_temp, nList2_temp2)
 
    
-removeNinja :: Ninja -> [Ninja] -> [Ninja] -- ozgun ekledi 
-removeNinja removedNinja (x:xs)
+removeNinja :: Ninja -> [Ninja] -> [Ninja] -- sinem: runtimedaki hatayi duzelttim, ama sonuclari yanlis veriyor
+removeNinja removedNinja [] = []
+removeNinja removedNinja ninjalist@(x:xs) 
    | (name removedNinja) == name x  = removeNinja removedNinja xs
    | otherwise                      = x : removeNinja removedNinja xs
+
    
 pushList :: Ninja -> [Ninja] -> [Ninja] -- ozgun ekledi
 pushList newNinja ninjaList = newNinja : ninjaList
