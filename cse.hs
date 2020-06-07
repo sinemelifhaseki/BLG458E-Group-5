@@ -5,6 +5,7 @@ import System.IO
 import Data.Char
 import System.Random
 import Control.Monad
+import System.Exit (exitSuccess)
 
 
 data Ninja = Ninja {name:: String, country:: Char, status:: String, exam1:: Float, exam2:: Float, ability1:: String, ability2:: String, r:: Int, score:: Float} deriving Show
@@ -87,10 +88,17 @@ printMenu allLists = do
                      'a' -> do
                           putStrLn "Enter the country code: "
                           cCode <- getLine
-                          --let allLists = insertNinjas input -- allLists type : [[Ninja]] 
+                          if (toUpper (head cCode)) == 'F' || (toUpper (head cCode)) == 'E' || (toUpper (head cCode)) == 'N' || (toUpper (head cCode)) == 'W' || (toUpper (head cCode)) == 'L'
+                          then putStr ""
+                          else do
+                            putStrLn "You have entered an invalid country code. Please choose again."
+                            putStrLn "" >> printMenu allLists
                           let countryList = parseNinjas (toUpper (head cCode)) allLists
                           putStrLn ""
-                          printNinjas (nSort countryList)
+                          if length countryList > 0
+                             then do printNinjas (nSort countryList)
+                          else do
+                              putStrLn "There is no suitable ninja in this country! Please choose again."
                           putStrLn "" >> printMenu allLists
                      'b' -> do 
                           --let allLists = insertNinjas input -- allLists type : [[Ninja]] 
@@ -107,13 +115,32 @@ printMenu allLists = do
                           name1 <- getLine
                           putStrLn "Enter the country code of first ninja: "
                           cCode1 <- getLine
+                          if (toUpper (head cCode1)) == 'F' || (toUpper (head cCode1)) == 'E' || (toUpper (head cCode1)) == 'N' || (toUpper (head cCode1)) == 'W' || (toUpper (head cCode1)) == 'L'
+                          then putStr ""
+                          else do
+                            putStrLn "You have entered an invalid country code. Please choose again."
+                            putStrLn "" >> printMenu allLists
+                          let countryList1 = nSort (parseNinjas (toUpper (head cCode1)) allLists)
+                          if (name (findNinja countryList1 name1)) == "Error"
+                          then do 
+                              putStrLn "There is no such available Ninja to fight for the first country."
+                              putStrLn "" >> printMenu allLists
+                          else putStr ""
                           putStrLn "Enter the name of second ninja: "
                           name2 <- getLine
                           putStrLn "Enter the country code of second ninja: "
                           cCode2 <- getLine
-                          --let allLists = insertNinjas input -- allLists type : [[Ninja]]
-                          let countryList1 = nSort (parseNinjas (toUpper (head cCode1)) allLists)
+                          if (toUpper (head cCode2)) == 'F' || (toUpper (head cCode2)) == 'E' || (toUpper (head cCode2)) == 'N' || (toUpper (head cCode2)) == 'W' || (toUpper (head cCode2)) == 'L'
+                          then putStr ""
+                          else do
+                            putStrLn "You have entered an invalid country code. Please choose again."
+                            putStrLn "" >> printMenu allLists
                           let countryList2 = nSort (parseNinjas (toUpper (head cCode2)) allLists)
+                          if (name (findNinja countryList2 name2)) == "Error"
+                          then do 
+                              putStrLn "There is no such available Ninja to fight for second country."
+                              putStrLn "" >> printMenu allLists
+                          else putStr ""
                           let ninjaLists = makeFight findNinja countryList1 countryList2 name1 name2
                           putStr "Winner: "
                           printNinja (head (fst ninjaLists))
@@ -131,7 +158,7 @@ printMenu allLists = do
                           putStr "Winner: "
                           printNinja2 (head (fst ninjaLists))
                           putStrLn "" >> printMenu (findRemainingLists (toUpper (head cCode1)) (toUpper (head cCode2)) allLists (fst ninjaLists) (snd ninjaLists)) -- burada inputu güncellememiz gerekecek sanırım
-                     'e' -> return ()
+                     'e' -> exitSuccess
                      _ -> putStrLn "Invalid choice, choose again." >> printMenu allLists
 
 findRemainingLists :: Char -> Char -> [Ninja] -> [Ninja] -> [Ninja] -> [Ninja]
@@ -239,6 +266,7 @@ findRemainingLists first second allLists list1 list2 = case (first,second) of
 
 
 findNinja :: [Ninja] -> [Char] -> Ninja
+findNinja [] _ = (Ninja {name="Error", country = '1', status = "Junior", exam1 = 1, exam2 = 1, ability1 = "", ability2 = "", r = 0, score = -1})
 findNinja ninjaList@(x:xs) nameWanted 
    | name x == nameWanted = x
    | otherwise            = findNinja xs nameWanted
