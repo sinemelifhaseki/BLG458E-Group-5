@@ -110,9 +110,11 @@ printMenu input = do
                           name2 <- getLine
                           putStrLn "Enter the country code of second ninja: "
                           cCode2 <- getLine
+                          let allLists = insertNinjas input -- allLists type : [[Ninja]]
                           let countryList1 = parseNinjas (toUpper (head cCode1)) allLists
                           let countryList2 = parseNinjas (toUpper (head cCode2)) allLists
-                          
+                          --fonk cagircaz
+                          putStrLn "" >> printMenu input
                      --'d' ->
                      'e' -> return ()
                      _ -> putStrLn "Invalid choice, choose again." >> printMenu input
@@ -132,7 +134,7 @@ makeFight findNinja nList1 nList2 name1 name2
 
 compareAbilities :: Ninja -> Ninja -> Bool
 compareAbilities ninja1 ninja2
-   | (ability1 ninja1 + ability2 ninja1 ) > (ability1 ninja2 + ability2 ninja2 ) = True
+   | (abilitySum findAbility (ability1 ninja1) (ability2 ninja1)  ) > (abilitySum findAbility (ability1 ninja2) (ability2 ninja2)  ) = True
    | otherwise                                                                   = False
 
 
