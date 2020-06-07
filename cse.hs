@@ -59,7 +59,6 @@ insertNinja x = case (xWords !! 1) of
                          
                 where 
                    xWords = words (x)
-             
 
 
 ourFilter f letter [] = []
@@ -83,7 +82,16 @@ printMenu input = do
               choice <- getLine
               case head choice of
                      --'a' -> insertNinjas input >>= printMenu
-                     --'b' ->
+                     'b' -> do 
+                          let allLists = insertNinjas input -- allLists type : [[Ninja]] 
+                          let fire = parseNinjas 'F' allLists
+                          let earth = parseNinjas 'E' allLists
+                          let lightning = parseNinjas 'L' allLists
+                          let water = parseNinjas 'W' allLists
+                          let wind = parseNinjas 'n' allLists
+                          putStrLn ""
+                          printNinjas (mergeNinjas fire earth lightning water wind)
+                          putStrLn "" >> printMenu input
                      --'c' ->
                      --'d' ->
                      'e' -> return ()
@@ -103,12 +111,31 @@ sortNinjas ninja [] = [ninja]
 sortNinjas ninja xs@(x':xs') 
    | r ninja < r x'                                = ninja : xs    
    | (r ninja == r x') && compareScores ninja x'   = ninja : xs
-   | otherwise                                             = x' : sortNinjas ninja xs'
+   | otherwise                                     = x' : sortNinjas ninja xs'
 
 nSort :: [Ninja] -> [Ninja]
 nSort [] = []
 nSort (x:xs) = sortNinjas x (nSort xs)
 
+
+mergeNinjas :: [Ninja] -> [Ninja] -> [Ninja] -> [Ninja] -> [Ninja] -> [Ninja] 
+mergeNinjas fire earth lightning water wind = nSort (fire ++ earth ++ lightning ++ water ++ wind)
+
+printNinjas :: [Ninja] -> IO ()
+printNinjas ninjaList = mapM_ printNinja ninjaList
+
+printNinja :: Ninja -> IO ()
+printNinja ninja = do 
+            putStr (show (name ninja))
+            putStr (", Score: ")
+            putStr (show (score ninja))
+            putStr (", Status: ")
+            putStr (show (status ninja))
+            putStr (", Round: ")
+            putStr (show (r ninja))
+            putStrLn ""
+            
+ 
 main = do
     args <- getArgs -- IO [String]
     content <- readFile (args !! 0)
@@ -116,26 +143,27 @@ main = do
     --let lineWords = words (fileLines !! 1)
     --putStrLn (show (lineWords))
     let x = fileLines !! 1
-    putStrLn (show (typeOf (x)))
+    --putStrLn (show (typeOf (x)))
     --let naruto = (Ninja {name=(words (x) !! 0), country = ((words (x) !! 1) !! 0), status = "Junior", exam1 = read (words (x) !! 2) :: Float, exam2 = read (words (x) !! 3) :: Float, ability1 = (words (x) !! 4), ability2 = (words (x) !! 5), r = 0}) : fire
-    let allLists = insertNinjas fileLines -- allLists type : [[Ninja]] 
-    let fire = parseNinjas 'F' allLists
-    let earth = parseNinjas 'E' allLists
-    let lightning = parseNinjas 'L' allLists
-    let water = parseNinjas 'W' allLists
-    let wind = parseNinjas 'n' allLists
-    putStrLn (show ("Beni gorun:"))
-    putStrLn (show (name (head (nSort allLists)))) -- sasuke
-    putStrLn (show (name (head (tail (nSort allLists))))) -- gaara 
-    putStrLn (show (name (head (tail (tail (nSort allLists)))))) -- sana
-    putStrLn (show (name (head (tail (tail (tail (nSort allLists))))))) -- naruto
-    putStrLn (show (name (head (tail (tail (tail (tail (nSort allLists)))))))) -- aimi 
-    putStrLn (show (name (head (tail (tail (tail (tail (tail (nSort allLists))))))))) -- suiu
-    putStrLn (show (name (head (tail (tail (tail (tail (tail (tail (nSort allLists)))))))))) -- haruki
-    putStrLn (show (name (head (tail (tail (tail (tail (tail (tail (tail (nSort allLists))))))))))) -- neiji 
-    putStrLn (show (name (head (tail (tail (tail (tail (tail (tail (tail (tail (nSort allLists)))))))))))) -- samidare
-    putStrLn (show (name (head (tail (tail (tail (tail (tail (tail (tail (tail (tail (nSort allLists))))))))))))) --midare
-    putStrLn (show ("Beni gordunuz:"))
+    --let allLists = insertNinjas fileLines -- allLists type : [[Ninja]] 
+    --let fire = parseNinjas 'F' allLists
+    --let earth = parseNinjas 'E' allLists
+    --let lightning = parseNinjas 'L' allLists
+    --let water = parseNinjas 'W' allLists
+    --let wind = parseNinjas 'n' allLists
+    --putStrLn (show ("Beni gorun:"))
+    --printNinjas (mergeNinjas fire earth lightning water wind)
+    --putStrLn (show (name (head (mergeNinjas fire earth lightning water wind)))) -- sasuke
+    --putStrLn (show (name (head (tail (mergeNinjas fire earth lightning water wind))))) -- gaara 
+    --putStrLn (show (name (head (tail (tail (mergeNinjas fire earth lightning water wind)))))) -- sana
+    --putStrLn (show (name (head (tail (tail (tail (mergeNinjas fire earth lightning water wind))))))) -- naruto
+    --putStrLn (show (name (head (tail (tail (tail (tail (mergeNinjas fire earth lightning water wind)))))))) -- aimi 
+    --putStrLn (show (name (head (tail (tail (tail (tail (tail (mergeNinjas fire earth lightning water wind))))))))) -- suiu
+    --putStrLn (show (name (head (tail (tail (tail (tail (tail (tail (mergeNinjas fire earth lightning water wind)))))))))) -- haruki
+    --putStrLn (show (name (head (tail (tail (tail (tail (tail (tail (tail (mergeNinjas fire earth lightning water wind))))))))))) -- neiji 
+    --putStrLn (show (name (head (tail (tail (tail (tail (tail (tail (tail (tail (mergeNinjas fire earth lightning water wind)))))))))))) -- samidare
+    --putStrLn (show (name (head (tail (tail (tail (tail (tail (tail (tail (tail (tail (mergeNinjas fire earth lightning water wind))))))))))))) --midare
+    --putStrLn (show ("Beni gordunuz:"))
     --putStrLn (show (name (head (tail (wind)))))
     --putStrLn (show (name (head (tail (fire)))))
     --putStrLn (show (name (head (tail (lightning)))))
@@ -144,10 +172,10 @@ main = do
     --putStrLn (show (typeOf (lightning)))
     --let lightning = (Ninja {name=(words (x) !! 0), country = ((words (x) !! 1) !! 0), status = "Junior", exam1 = read (words (x) !! 2) :: Float, exam2 = read (words (x) !! 3) :: Float, ability1 = (words (x) !! 4), ability2 = (words (x) !! 5), r = 0}) : lightning
    -- putStrLn (show (name (head (insertNinjas fileLines)))) -- şu an sadece txtnin son satırını alıyor ama lightninge de ekememiş anlamadım
-    putStrLn (show (score  (head (tail (allLists))))) -- Sasuke, fire, 133
-    putStrLn (show (score  (head (tail (tail (tail (tail (tail (allLists))))))))) -- Kankuro, wind
-    putStrLn (show (score  (head (tail (tail (tail (tail (tail (tail (allLists)))))))))) -- Midare, water
-    putStrLn (show (length allLists))
+    --putStrLn (show (score  (head (tail (allLists))))) -- Sasuke, fire, 133
+    --putStrLn (show (score  (head (tail (tail (tail (tail (tail (allLists))))))))) -- Kankuro, wind
+    --putStrLn (show (score  (head (tail (tail (tail (tail (tail (tail (allLists)))))))))) -- Midare, water
+    --putStrLn (show (length allLists))
     printMenu fileLines
     --putStr (name naruto)
     --putStrLn (show (length lise))
