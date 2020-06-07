@@ -3,6 +3,9 @@ import Data.List
 import Data.Typeable
 import System.IO
 import Data.Char
+import System.Random
+import Control.Monad
+
 
 data Ninja = Ninja {name:: String, country:: Char, status:: String, exam1:: Float, exam2:: Float, ability1:: String, ability2:: String, r:: Int, score:: Float} deriving Show
 --status initialized as junior --> will be upgraded to journeyman
@@ -157,8 +160,8 @@ printMenu input = do
                           let countryList2 = parseNinjas (toUpper (head cCode2)) allLists
                           -- fonksiyon buraya gelcekti
                           let ninjaLists = makeFight findNinja countryList1 countryList2 name1 name2
-                          printNinjas (snd ninjaLists)
-                          
+                          putStr "Winner: "
+                          printNinja (head (fst ninjaLists))
                           putStrLn "" >> printMenu input
                           -- burada bir hata veriyor sanırım anlamadım
                      --'d' ->
@@ -172,11 +175,11 @@ findNinja ninjaList@(x:xs) nameWanted
 
 makeFight :: ([Ninja] -> [Char] -> Ninja) -> [Ninja] -> [Ninja] -> [Char] -> [Char] -> ([Ninja],[Ninja])
 makeFight findNinja nList1 nList2 name1 name2
-   | score (findNinja nList1 name1) > score (findNinja nList2 name2) = updateLists 1 name1 name2 nList1 nList2
-   | score (findNinja nList1 name1) < score (findNinja nList2 name2) = updateLists 2 name1 name2 nList1 nList2
-   | (score (findNinja nList1 name1) == score (findNinja nList2 name2)) && compareAbilities (findNinja nList1 name1) (findNinja nList2 name2) = updateLists 1 name1 name2 nList1 nList2
-   | (score (findNinja nList1 name1) == score (findNinja nList2 name2)) && compareAbilities (findNinja nList2 name2) (findNinja nList1 name1) = updateLists 2 name1 name2 nList1 nList2
-   | otherwise                                                                                                                                = updateLists 1 name1 name2 nList1 nList2 -- random olacak burası
+   | score (findNinja nList1 name1) > score (findNinja nList2 name2) = updateLists 1 name1 name2 nList1 nList2 -- 1st ninja wins by score
+   | score (findNinja nList1 name1) < score (findNinja nList2 name2) = updateLists 2 name1 name2 nList1 nList2 -- 2nd ninja wins by score
+   | (score (findNinja nList1 name1) == score (findNinja nList2 name2)) && compareAbilities (findNinja nList1 name1) (findNinja nList2 name2) = updateLists 1 name1 name2 nList1 nList2 -- 1st ninja by ability
+   | (score (findNinja nList1 name1) == score (findNinja nList2 name2)) && compareAbilities (findNinja nList2 name2) (findNinja nList1 name1) = updateLists 2 name1 name2 nList1 nList2 -- 2nd ninja by ability
+   | otherwise                                                                                                                                = updateLists 1 name1 name2 nList1 nList2 -- random 
 
 compareAbilities :: Ninja -> Ninja -> Bool
 compareAbilities ninja1 ninja2
