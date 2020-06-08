@@ -162,15 +162,20 @@ printMenu allLists = do
                               putStrLn "You have entered an invalid country code. Please choose again."
                               putStrLn "" >> printMenu allLists
                             let countryList2 = nSort $ parseNinjas (toUpper (head cCode2)) allLists -- function application
-                            if (name (findNinja countryList2 name2)) == "Error"
+                            if checkIfPromoted countryList2 == True
                             then do 
-                                putStrLn "There is no such available Ninja to fight for second country."
-                                putStrLn "" >> printMenu allLists
-                            else putStr ""
-                            let ninjaLists = makeFight findNinja countryList1 countryList2 name1 name2
-                            putStr "Winner: "
-                            printNinja2 (head (fst ninjaLists))
-                            putStrLn "" >> printMenu (findRemainingLists (capitalize cCode1) (capitalize cCode2) allLists (fst ninjaLists) (snd ninjaLists)) 
+                              putStrLn "This country has already one promoted ninja and can no longer take place in fights. Please choose again."
+                              putStrLn "" >> printMenu allLists
+                            else do
+                              if (name (findNinja countryList2 name2)) == "Error"
+                              then do 
+                                  putStrLn "There is no such available Ninja to fight for second country."
+                                  putStrLn "" >> printMenu allLists
+                              else putStr ""
+                              let ninjaLists = makeFight findNinja countryList1 countryList2 name1 name2
+                              putStr "Winner: "
+                              printNinja2 (head (fst ninjaLists))
+                              putStrLn "" >> printMenu (findRemainingLists (capitalize cCode1) (capitalize cCode2) allLists (fst ninjaLists) (snd ninjaLists)) 
                            
                      'd' -> do
                           putStrLn "Enter the country code of first ninja: "
