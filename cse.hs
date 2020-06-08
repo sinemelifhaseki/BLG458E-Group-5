@@ -68,6 +68,16 @@ ourFilter f letter [] = []
 ourFilter f letter (x:xs) 
     | f letter x        = x : ourFilter f letter xs
     | otherwise         = ourFilter f letter xs
+    
+-- isJourneyman: called within filter to determine whether a ninja is promoted to journeyman
+isJourneyman :: Ninja -> Bool
+isJourneyman ninja 
+  | (status ninja) == "JourneyMan"     = True
+  | otherwise                          = False
+  
+-- getJourneymen: filters out the journeymen from all ninjas, returns that list
+getJourneymen :: [Ninja] -> [Ninja]
+getJourneymen ninjaList = filter isJourneyman ninjaList 
 
 -- parseNinjas: filter is applied with the filtering function of comparing the requested country and ninja's country
 parseNinjas :: Char -> [Ninja] -> [Ninja] 
@@ -112,7 +122,7 @@ printMenu allLists = do
                           let earth = parseNinjas 'E' allLists
                           let lightning = parseNinjas 'L' allLists
                           let water = parseNinjas 'W' allLists
-                          let wind = parseNinjas 'n' allLists
+                          let wind = parseNinjas 'N' allLists
                           putStrLn ""
                           printNinjas (mergeNinjas fire earth lightning water wind)
                           putStrLn "" >> printMenu allLists
@@ -198,7 +208,9 @@ printMenu allLists = do
                                  putStr "Winner: "
                                  printNinja2 (head (fst ninjaLists))
                                  putStrLn "" >> printMenu (findRemainingLists (toUpper (head cCode1)) (toUpper (head cCode2)) allLists (fst ninjaLists) (snd ninjaLists)) -- burada inputu güncellememiz gerekecek sanırım
-                     'e' -> exitSuccess
+                     'e' -> do
+                           printNinjas (getJourneymen allLists)
+                           exitSuccess
                      _ -> putStrLn "Invalid choice, choose again." >> printMenu allLists
 
 --- checkIfPromoted: checks whether a country has a promoted ninja, returns true if there's one
@@ -244,7 +256,7 @@ findRemainingLists first second allLists list1 list2 = case (first,second) of
         ('F', 'W') ->  do --fire earth lightning water wind
                           let earth = parseNinjas 'E' allLists
                           let lightning = parseNinjas 'L' allLists
-                          let water = parseNinjas 'W' allLists
+                          let wind = parseNinjas 'N' allLists
                           mergeNinjas list1 earth lightning list2 wind
         ('F', 'E') ->  do --fire earth lightning water wind
                           let wind = parseNinjas 'N' allLists
@@ -285,7 +297,7 @@ findRemainingLists first second allLists list1 list2 = case (first,second) of
                           let earth = parseNinjas 'E' allLists
                           let fire = parseNinjas 'F' allLists
                           let water = parseNinjas 'W' allLists
-                          mergeNinjas list1 earth lightning water list2
+                          mergeNinjas fire earth list1 water list2
         ('W', 'N') ->  do --fire earth lightning water wind
                           let earth = parseNinjas 'E' allLists
                           let lightning = parseNinjas 'L' allLists
@@ -294,7 +306,7 @@ findRemainingLists first second allLists list1 list2 = case (first,second) of
         ('W', 'F') ->  do --fire earth lightning water wind
                           let earth = parseNinjas 'E' allLists
                           let lightning = parseNinjas 'L' allLists
-                          let water = parseNinjas 'W' allLists
+                          let wind = parseNinjas 'N' allLists
                           mergeNinjas list1 earth lightning list2 wind
         ('E', 'F') ->  do --fire earth lightning water wind
                           let wind = parseNinjas 'N' allLists
@@ -335,7 +347,7 @@ findRemainingLists first second allLists list1 list2 = case (first,second) of
                           let earth = parseNinjas 'E' allLists
                           let fire = parseNinjas 'F' allLists
                           let water = parseNinjas 'W' allLists
-                          mergeNinjas list1 earth lightning water list2
+                          mergeNinjas fire earth list2 water list1
         ('N', 'W') ->  do --fire earth lightning water wind
                           let earth = parseNinjas 'E' allLists
                           let lightning = parseNinjas 'L' allLists
