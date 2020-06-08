@@ -165,15 +165,39 @@ printMenu allLists = do
                           else do
                             putStrLn "You have entered an invalid country code. Please choose again."
                             putStrLn "" >> printMenu allLists
-                          putStrLn "Enter the country code of second ninja: "
-                          cCode2 <- getLine
-                          --let allLists = insertNinjas input -- allLists type : [[Ninja]]
                           let countryList1 = nSort (parseNinjas (toUpper (head cCode1)) allLists)
-                          let countryList2 = nSort (parseNinjas (toUpper (head cCode2)) allLists)
-                          let ninjaLists = makeFight findNinja countryList1 countryList2 (name (head countryList1)) (name (head countryList2))
-                          putStr "Winner: "
-                          printNinja2 (head (fst ninjaLists))
-                          putStrLn "" >> printMenu (findRemainingLists (toUpper (head cCode1)) (toUpper (head cCode2)) allLists (fst ninjaLists) (snd ninjaLists)) -- burada inputu güncellememiz gerekecek sanırım
+                          if checkIfPromoted countryList1 == True
+                          then do 
+                              putStrLn "This country has already one promoted ninja and can no longer take place in fights. Please choose again."
+                              putStrLn "" >> printMenu allLists
+                          else do 
+                              if length countryList1 == 0 
+                              then do
+                                putStrLn "There is no such available Ninja to fight for first country."
+                                putStrLn "" >> printMenu allLists
+                              else putStr ""
+                              putStrLn "Enter the country code of second ninja: "
+                              cCode2 <- getLine
+                              if (toUpper (head cCode1)) == 'F' || (toUpper (head cCode1)) == 'E' || (toUpper (head cCode1)) == 'N' || (toUpper (head cCode1)) == 'W' || (toUpper (head cCode1)) == 'L'
+                              then putStr ""
+                              else do
+                                 putStrLn "You have entered an invalid country code. Please choose again."
+                                 putStrLn "" >> printMenu allLists
+                              let countryList2 = nSort (parseNinjas (toUpper (head cCode2)) allLists)
+                              if checkIfPromoted countryList2 == True
+                              then do 
+                                 putStrLn "This country has already one promoted ninja and can no longer take place in fights. Please choose again."
+                                 putStrLn "" >> printMenu allLists
+                              else do 
+                                 if length countryList2 == 0 
+                                 then do
+                                   putStrLn "There is no such available Ninja to fight for second country."
+                                   putStrLn "" >> printMenu allLists
+                                 else do                               
+                                 let ninjaLists = makeFight findNinja countryList1 countryList2 (name (head countryList1)) (name (head countryList2))
+                                 putStr "Winner: "
+                                 printNinja2 (head (fst ninjaLists))
+                                 putStrLn "" >> printMenu (findRemainingLists (toUpper (head cCode1)) (toUpper (head cCode2)) allLists (fst ninjaLists) (snd ninjaLists)) -- burada inputu güncellememiz gerekecek sanırım
                      'e' -> exitSuccess
                      _ -> putStrLn "Invalid choice, choose again." >> printMenu allLists
 
@@ -187,6 +211,36 @@ checkIfPromoted list@(x:xs)
 -- findRemainingLists: used in parts C and D to find which country lists were updated & which not so that we can merge all country lists back again, along with the updated ones
 findRemainingLists :: Char -> Char -> [Ninja] -> [Ninja] -> [Ninja] -> [Ninja] 
 findRemainingLists first second allLists list1 list2 = case (first,second) of
+        ('F', 'F') ->  do --fire earth lightning water wind
+                          let earth = parseNinjas 'E' allLists
+                          let lightning = parseNinjas 'L' allLists
+                          let water = parseNinjas 'W' allLists
+                          let wind = parseNinjas 'N' allLists
+                          mergeNinjas list2 earth lightning water wind
+        ('E', 'E') ->  do --fire earth lightning water wind
+                          let fire = parseNinjas 'F' allLists
+                          let lightning = parseNinjas 'L' allLists
+                          let water = parseNinjas 'W' allLists
+                          let wind = parseNinjas 'N' allLists
+                          mergeNinjas fire list2 lightning water wind
+        ('W', 'W') ->  do --fire earth lightning water wind
+                          let earth = parseNinjas 'E' allLists
+                          let lightning = parseNinjas 'L' allLists
+                          let fire = parseNinjas 'F' allLists
+                          let wind = parseNinjas 'N' allLists
+                          mergeNinjas fire earth lightning list2 wind
+        ('L', 'L') ->  do --fire earth lightning water wind
+                          let earth = parseNinjas 'E' allLists
+                          let fire = parseNinjas 'F' allLists
+                          let water = parseNinjas 'W' allLists
+                          let wind = parseNinjas 'N' allLists
+                          mergeNinjas fire earth list2 water wind
+        ('N', 'N') ->  do --fire earth lightning water wind
+                          let earth = parseNinjas 'E' allLists
+                          let lightning = parseNinjas 'L' allLists
+                          let water = parseNinjas 'W' allLists
+                          let fire = parseNinjas 'F' allLists
+                          mergeNinjas fire earth lightning water list2
         ('F', 'W') ->  do --fire earth lightning water wind
                           let earth = parseNinjas 'E' allLists
                           let lightning = parseNinjas 'L' allLists
@@ -319,14 +373,22 @@ updateLists winner name1 name2 nList1 nList2
                                  let new_score = score winner_ninja + 10
                                  let new_round = r winner_ninja + 1
                                  let loser_ninja = findNinja nList2 name2        -- find the loser ninja by its name
-                                 if new_round >= 3                               -- if the winner ninja has won more than or equal to 3 rounds, promote him/her to JourneyMan
+                                 if country winner_ninja == country loser_ninja
                                  then do 
+                                           let new_ninja = (Ninja {name = (name winner_ninja), country = (country winner_ninja), status = "Junior", exam1 = (exam1 winner_ninja), exam2 = (exam2 winner_ninja), ability1 = (ability1 winner_ninja), ability2 = (ability2 winner_ninja), r = new_round, score = new_score})
+                                           let nList1_temp = removeNinja winner_ninja nList2   -- first remove the winner ninja from list so we can push back the promoted version
+                                           let nList1_temp2 = pushList new_ninja nList1_temp   -- push the promoted ninja to back its list
+                                           let nList2_temp = removeNinja loser_ninja nList1_temp2    -- remove the disqualified ninja from country list
+                                           (nList2_temp, nList2_temp) 
+                                 else do 
+                                   if new_round >= 3                               -- if the winner ninja has won more than or equal to 3 rounds, promote him/her to JourneyMan
+                                   then do 
                                            let new_ninja = (Ninja {name = (name winner_ninja), country = (country winner_ninja), status = "JourneyMan", exam1 = (exam1 winner_ninja), exam2 = (exam2 winner_ninja), ability1 = (ability1 winner_ninja), ability2 = (ability2 winner_ninja), r = new_round, score = new_score})
                                            let nList1_temp = removeNinja winner_ninja nList1   -- first remove the winner ninja from list so we can push back the promoted version
                                            let nList1_temp2 = pushList new_ninja nList1_temp   -- push the promoted ninja to back its list
                                            let nList2_temp = removeNinja loser_ninja nList2    -- remove the disqualified ninja from country list
                                            (nList1_temp2, nList2_temp) 
-                                 else do
+                                   else do
                                               let new_ninja = (Ninja {name = (name winner_ninja), country = (country winner_ninja), status = "Junior", exam1 = (exam1 winner_ninja), exam2 = (exam2 winner_ninja), ability1 = (ability1 winner_ninja), ability2 = (ability2 winner_ninja), r = new_round, score = new_score})
                                               let nList1_temp = removeNinja winner_ninja nList1  -- first remove the winner ninja from list so we can push back the updated version
                                               let nList1_temp2 = pushList new_ninja nList1_temp  -- push the updated ninja back to its list
@@ -339,14 +401,22 @@ updateLists winner name1 name2 nList1 nList2
                                  let new_score = score winner_ninja + 10
                                  let new_round = r winner_ninja + 1
                                  let loser_ninja = findNinja nList1 name1
-                                 if new_round >= 3
+                                 if country winner_ninja == country loser_ninja
+                                 then do 
+                                           let new_ninja = (Ninja {name = (name winner_ninja), country = (country winner_ninja), status = "Junior", exam1 = (exam1 winner_ninja), exam2 = (exam2 winner_ninja), ability1 = (ability1 winner_ninja), ability2 = (ability2 winner_ninja), r = new_round, score = new_score})
+                                           let nList1_temp = removeNinja winner_ninja nList2   -- first remove the winner ninja from list so we can push back the promoted version
+                                           let nList1_temp2 = pushList new_ninja nList1_temp   -- push the promoted ninja to back its list
+                                           let nList2_temp = removeNinja loser_ninja nList1_temp2    -- remove the disqualified ninja from country list
+                                           (nList2_temp, nList2_temp) 
+                                 else do 
+                                   if new_round >= 3
                                      then do 
                                              let new_ninja = (Ninja {name = (name winner_ninja), country = (country winner_ninja), status = "JourneyMan", exam1 = (exam1 winner_ninja), exam2 = (exam2 winner_ninja), ability1 = (ability1 winner_ninja), ability2 = (ability2 winner_ninja), r = new_round, score = new_score})
                                              let nList2_temp = removeNinja winner_ninja nList2
                                              let nList2_temp2 = pushList new_ninja nList2_temp
                                              let nList1_temp = removeNinja loser_ninja nList1
                                              (nList2_temp2, nList1_temp)
-                                 else do
+                                    else do
                                              let new_ninja = (Ninja {name = (name winner_ninja), country = (country winner_ninja), status = "Junior", exam1 = (exam1 winner_ninja), exam2 = (exam2 winner_ninja), ability1 = (ability1 winner_ninja), ability2 = (ability2 winner_ninja), r = new_round, score = new_score})
                                              let nList2_temp = removeNinja winner_ninja nList2
                                              let nList2_temp2 = pushList new_ninja nList2_temp
