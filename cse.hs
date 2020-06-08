@@ -345,13 +345,13 @@ updateLists winner name1 name2 nList1 nList2
                                              let nList2_temp = removeNinja winner_ninja nList2
                                              let nList2_temp2 = pushList new_ninja nList2_temp
                                              let nList1_temp = removeNinja loser_ninja nList1
-                                             (nList1_temp, nList2_temp2)
+                                             (nList2_temp2, nList1_temp)
                                  else do
                                              let new_ninja = (Ninja {name = (name winner_ninja), country = (country winner_ninja), status = "Junior", exam1 = (exam1 winner_ninja), exam2 = (exam2 winner_ninja), ability1 = (ability1 winner_ninja), ability2 = (ability2 winner_ninja), r = new_round, score = new_score})
                                              let nList2_temp = removeNinja winner_ninja nList2
                                              let nList2_temp2 = pushList new_ninja nList2_temp
                                              let nList1_temp = removeNinja loser_ninja nList1
-                                             (nList1_temp, nList2_temp2)
+                                             (nList2_temp2, nList1_temp)
 
 -- removeNinja: to remove a disqualified / to-be-updated ninja from its list based on his/her name and returns the updated list
 removeNinja :: Ninja -> [Ninja] -> [Ninja] 
