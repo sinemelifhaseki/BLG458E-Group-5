@@ -25,6 +25,7 @@ wind = []
 earth :: [Ninja]
 earth = []
 
+
 findAbility :: String -> Float
 findAbility a = case a of
         "Clone"     -> 20.0
@@ -98,8 +99,13 @@ printMenu allLists = do
                           if length countryList > 0
                              then do printNinjas (nSort countryList)
                           else do
-                              putStrLn "There is no suitable ninja in this country! Please choose again."
-                          putStrLn "" >> printMenu allLists
+                              putStrLn "There is no suitable ninja in this country! Please choose again. (All ninjas in this country may be disqualified.)"
+                          if checkIfPromoted countryList == True
+                          then do 
+                              putStrLn "This country has already one promoted ninja and can no longer take place in fights."
+                              putStrLn "" >> printMenu allLists
+                          else 
+                              putStrLn "" >> printMenu allLists
                      'b' -> do 
                           --let allLists = insertNinjas input -- allLists type : [[Ninja]] 
                           let fire = parseNinjas 'F' allLists
@@ -121,34 +127,44 @@ printMenu allLists = do
                             putStrLn "You have entered an invalid country code. Please choose again."
                             putStrLn "" >> printMenu allLists
                           let countryList1 = nSort (parseNinjas (toUpper (head cCode1)) allLists)
-                          if (name (findNinja countryList1 name1)) == "Error"
+                          if checkIfPromoted countryList1 == True
                           then do 
-                              putStrLn "There is no such available Ninja to fight for the first country."
+                              putStrLn "This country has already one promoted ninja and can no longer take place in fights. Please choose again."
                               putStrLn "" >> printMenu allLists
-                          else putStr ""
-                          putStrLn "Enter the name of second ninja: "
-                          name2 <- getLine
-                          putStrLn "Enter the country code of second ninja: "
-                          cCode2 <- getLine
-                          if (toUpper (head cCode2)) == 'F' || (toUpper (head cCode2)) == 'E' || (toUpper (head cCode2)) == 'N' || (toUpper (head cCode2)) == 'W' || (toUpper (head cCode2)) == 'L'
-                          then putStr ""
-                          else do
-                            putStrLn "You have entered an invalid country code. Please choose again."
-                            putStrLn "" >> printMenu allLists
-                          let countryList2 = nSort (parseNinjas (toUpper (head cCode2)) allLists)
-                          if (name (findNinja countryList2 name2)) == "Error"
-                          then do 
-                              putStrLn "There is no such available Ninja to fight for second country."
+                          else do 
+                            if (name (findNinja countryList1 name1)) == "Error"
+                            then do 
+                                putStrLn "There is no such available Ninja to fight for the first country."
+                                putStrLn "" >> printMenu allLists
+                            else putStr ""
+                            putStrLn "Enter the name of second ninja: "
+                            name2 <- getLine
+                            putStrLn "Enter the country code of second ninja: "
+                            cCode2 <- getLine
+                            if (toUpper (head cCode2)) == 'F' || (toUpper (head cCode2)) == 'E' || (toUpper (head cCode2)) == 'N' || (toUpper (head cCode2)) == 'W' || (toUpper (head cCode2)) == 'L'
+                            then putStr ""
+                            else do
+                              putStrLn "You have entered an invalid country code. Please choose again."
                               putStrLn "" >> printMenu allLists
-                          else putStr ""
-                          let ninjaLists = makeFight findNinja countryList1 countryList2 name1 name2
-                          putStr "Winner: "
-                          printNinja (head (fst ninjaLists))
-                          putStrLn "" >> printMenu (findRemainingLists (toUpper (head cCode1)) (toUpper (head cCode2)) allLists (fst ninjaLists) (snd ninjaLists)) -- burada inputu güncellememiz gerekecek sanırım
+                            let countryList2 = nSort (parseNinjas (toUpper (head cCode2)) allLists)
+                            if (name (findNinja countryList2 name2)) == "Error"
+                            then do 
+                                putStrLn "There is no such available Ninja to fight for second country."
+                                putStrLn "" >> printMenu allLists
+                            else putStr ""
+                            let ninjaLists = makeFight findNinja countryList1 countryList2 name1 name2
+                            putStr "Winner: "
+                            printNinja (head (fst ninjaLists))
+                            putStrLn "" >> printMenu (findRemainingLists (toUpper (head cCode1)) (toUpper (head cCode2)) allLists (fst ninjaLists) (snd ninjaLists)) -- burada inputu güncellememiz gerekecek sanırım
                            
                      'd' -> do
                           putStrLn "Enter the country code of first ninja: "
                           cCode1 <- getLine
+                          if (toUpper (head cCode1)) == 'F' || (toUpper (head cCode1)) == 'E' || (toUpper (head cCode1)) == 'N' || (toUpper (head cCode1)) == 'W' || (toUpper (head cCode1)) == 'L'
+                          then putStr ""
+                          else do
+                            putStrLn "You have entered an invalid country code. Please choose again."
+                            putStrLn "" >> printMenu allLists
                           putStrLn "Enter the country code of second ninja: "
                           cCode2 <- getLine
                           --let allLists = insertNinjas input -- allLists type : [[Ninja]]
@@ -160,6 +176,13 @@ printMenu allLists = do
                           putStrLn "" >> printMenu (findRemainingLists (toUpper (head cCode1)) (toUpper (head cCode2)) allLists (fst ninjaLists) (snd ninjaLists)) -- burada inputu güncellememiz gerekecek sanırım
                      'e' -> exitSuccess
                      _ -> putStrLn "Invalid choice, choose again." >> printMenu allLists
+
+--- checks whether a country has a promoted ninja, returns true if there's one
+checkIfPromoted :: [Ninja] -> Bool
+checkIfPromoted [] = False
+checkIfPromoted list@(x:xs) 
+  | status x == "JourneyMan"   = True
+  | otherwise                  = checkIfPromoted xs
 
 findRemainingLists :: Char -> Char -> [Ninja] -> [Ninja] -> [Ninja] -> [Ninja]
 findRemainingLists first second allLists list1 list2 = case (first,second) of
