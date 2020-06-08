@@ -136,7 +136,7 @@ printMenu allLists = do
                           else do
                             putStrLn "You have entered an invalid country code. Please choose again."
                             putStrLn "" >> printMenu allLists
-                          let countryList1 = nSort (parseNinjas (toUpper (head cCode1)) allLists)
+                          let countryList1 = nSort $ parseNinjas (toUpper (head cCode1)) allLists
                           if checkIfPromoted countryList1 == True
                           then do 
                               putStrLn "This country has already one promoted ninja and can no longer take place in fights. Please choose again."
@@ -156,7 +156,7 @@ printMenu allLists = do
                             else do
                               putStrLn "You have entered an invalid country code. Please choose again."
                               putStrLn "" >> printMenu allLists
-                            let countryList2 = nSort (parseNinjas (toUpper (head cCode2)) allLists)
+                            let countryList2 = nSort $ parseNinjas (toUpper (head cCode2)) allLists
                             if (name (findNinja countryList2 name2)) == "Error"
                             then do 
                                 putStrLn "There is no such available Ninja to fight for second country."
@@ -175,7 +175,7 @@ printMenu allLists = do
                           else do
                             putStrLn "You have entered an invalid country code. Please choose again."
                             putStrLn "" >> printMenu allLists
-                          let countryList1 = nSort (parseNinjas (toUpper (head cCode1)) allLists)
+                          let countryList1 = nSort $ parseNinjas (toUpper (head cCode1)) allLists
                           if checkIfPromoted countryList1 == True
                           then do 
                               putStrLn "This country has already one promoted ninja and can no longer take place in fights. Please choose again."
@@ -193,7 +193,7 @@ printMenu allLists = do
                               else do
                                  putStrLn "You have entered an invalid country code. Please choose again."
                                  putStrLn "" >> printMenu allLists
-                              let countryList2 = nSort (parseNinjas (toUpper (head cCode2)) allLists)
+                              let countryList2 = nSort $ parseNinjas (toUpper (head cCode2)) allLists
                               if checkIfPromoted countryList2 == True
                               then do 
                                  putStrLn "This country has already one promoted ninja and can no longer take place in fights. Please choose again."
