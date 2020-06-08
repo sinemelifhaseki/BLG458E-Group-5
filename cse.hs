@@ -1,6 +1,4 @@
 import System.Environment
-import Data.List
-import Data.Typeable
 import System.IO
 import Data.Char
 import System.Random
@@ -21,6 +19,10 @@ wind = []
 earth :: [Ninja]
 earth = []
 
+-- capitalize letter by using function composition
+capitalize :: [Char] -> Char
+capitalize = toUpper . head
+
 -- findAbility: given a string, returns the value of that ability
 findAbility :: String -> Float
 findAbility a = case a of
@@ -35,6 +37,7 @@ findAbility a = case a of
         "Summon"    -> 50.0
         "Storm"     -> 10.0
         "Rock"      -> 20.0
+
         
 abilitySum :: (String -> Float) -> String -> String -> Float
 abilitySum findAbility a b = findAbility a + findAbility b
@@ -81,13 +84,15 @@ getJourneymen ninjaList = filter isJourneyman ninjaList
 
 -- parseNinjas: filter is applied with the filtering function of comparing the requested country and ninja's country
 parseNinjas :: Char -> [Ninja] -> [Ninja] 
-parseNinjas countryLetter allNinjas = ourFilter isSameCountry countryLetter allNinjas 
+parseNinjas countryLetter allNinjas = ourFilter isSameCountryCurried countryLetter allNinjas 
 
 -- isSameCountry: checks whether given country letter is equal to that ninja's country
-isSameCountry :: Char -> Ninja -> Bool 
-isSameCountry countryLetter ninjaInstance
+isSameCountry :: (Char, Ninja) -> Bool 
+isSameCountry (countryLetter,ninjaInstance)
      | (country ninjaInstance) == countryLetter     = True
      | otherwise                                    = False
+     
+isSameCountryCurried = curry isSameCountry -- curried function 
 
 -- MENU OPERATIONS
 printMenu allLists = do  
@@ -99,7 +104,7 @@ printMenu allLists = do
                      'a' -> do
                           putStrLn "Enter the country code: "
                           cCode <- getLine
-                          if (toUpper (head cCode)) == 'F' || (toUpper (head cCode)) == 'E' || (toUpper (head cCode)) == 'N' || (toUpper (head cCode)) == 'W' || (toUpper (head cCode)) == 'L'
+                          if (capitalize cCode) == 'F' || (capitalize cCode) == 'E' || (capitalize cCode) == 'N' || (capitalize cCode) == 'W' || (capitalize cCode) == 'L'
                           then putStr ""
                           else do
                             putStrLn "You have entered an invalid country code. Please choose again."
@@ -131,12 +136,12 @@ printMenu allLists = do
                           name1 <- getLine
                           putStrLn "Enter the country code of first ninja: "
                           cCode1 <- getLine
-                          if (toUpper (head cCode1)) == 'F' || (toUpper (head cCode1)) == 'E' || (toUpper (head cCode1)) == 'N' || (toUpper (head cCode1)) == 'W' || (toUpper (head cCode1)) == 'L'
+                          if (capitalize cCode1) == 'F' || (capitalize cCode1) == 'E' || (capitalize cCode1) == 'N' || (capitalize cCode1) == 'W' || (capitalize cCode1) == 'L'
                           then putStr ""
                           else do
                             putStrLn "You have entered an invalid country code. Please choose again."
                             putStrLn "" >> printMenu allLists
-                          let countryList1 = nSort $ parseNinjas (toUpper (head cCode1)) allLists
+                          let countryList1 = nSort $ parseNinjas (toUpper (head cCode1)) allLists  -- function application
                           if checkIfPromoted countryList1 == True
                           then do 
                               putStrLn "This country has already one promoted ninja and can no longer take place in fights. Please choose again."
@@ -151,12 +156,12 @@ printMenu allLists = do
                             name2 <- getLine
                             putStrLn "Enter the country code of second ninja: "
                             cCode2 <- getLine
-                            if (toUpper (head cCode2)) == 'F' || (toUpper (head cCode2)) == 'E' || (toUpper (head cCode2)) == 'N' || (toUpper (head cCode2)) == 'W' || (toUpper (head cCode2)) == 'L'
+                            if (capitalize cCode2) == 'F' || (capitalize cCode2) == 'E' || (capitalize cCode2) == 'N' || (capitalize cCode2) == 'W' || (capitalize cCode2) == 'L'
                             then putStr ""
                             else do
                               putStrLn "You have entered an invalid country code. Please choose again."
                               putStrLn "" >> printMenu allLists
-                            let countryList2 = nSort $ parseNinjas (toUpper (head cCode2)) allLists
+                            let countryList2 = nSort $ parseNinjas (toUpper (head cCode2)) allLists -- function application
                             if (name (findNinja countryList2 name2)) == "Error"
                             then do 
                                 putStrLn "There is no such available Ninja to fight for second country."
@@ -164,18 +169,18 @@ printMenu allLists = do
                             else putStr ""
                             let ninjaLists = makeFight findNinja countryList1 countryList2 name1 name2
                             putStr "Winner: "
-                            printNinja (head (fst ninjaLists))
-                            putStrLn "" >> printMenu (findRemainingLists (toUpper (head cCode1)) (toUpper (head cCode2)) allLists (fst ninjaLists) (snd ninjaLists)) -- burada inputu güncellememiz gerekecek sanırım
+                            printNinja2 (head (fst ninjaLists))
+                            putStrLn "" >> printMenu (findRemainingLists (capitalize cCode1) (capitalize cCode2) allLists (fst ninjaLists) (snd ninjaLists)) 
                            
                      'd' -> do
                           putStrLn "Enter the country code of first ninja: "
                           cCode1 <- getLine
-                          if (toUpper (head cCode1)) == 'F' || (toUpper (head cCode1)) == 'E' || (toUpper (head cCode1)) == 'N' || (toUpper (head cCode1)) == 'W' || (toUpper (head cCode1)) == 'L'
+                          if (capitalize cCode1) == 'F' || (capitalize cCode1) == 'E' || (capitalize cCode1) == 'N' || (capitalize cCode1) == 'W' || (capitalize cCode1) == 'L'
                           then putStr ""
                           else do
                             putStrLn "You have entered an invalid country code. Please choose again."
                             putStrLn "" >> printMenu allLists
-                          let countryList1 = nSort $ parseNinjas (toUpper (head cCode1)) allLists
+                          let countryList1 = nSort $ parseNinjas (capitalize cCode1) allLists  -- function application
                           if checkIfPromoted countryList1 == True
                           then do 
                               putStrLn "This country has already one promoted ninja and can no longer take place in fights. Please choose again."
@@ -188,12 +193,18 @@ printMenu allLists = do
                               else putStr ""
                               putStrLn "Enter the country code of second ninja: "
                               cCode2 <- getLine
-                              if (toUpper (head cCode1)) == 'F' || (toUpper (head cCode1)) == 'E' || (toUpper (head cCode1)) == 'N' || (toUpper (head cCode1)) == 'W' || (toUpper (head cCode1)) == 'L'
+                              if (capitalize cCode2) == 'F' || (capitalize cCode2) == 'E' || (capitalize cCode2) == 'N' || (capitalize cCode2) == 'W' || (capitalize cCode2) == 'L'
                               then putStr ""
                               else do
                                  putStrLn "You have entered an invalid country code. Please choose again."
                                  putStrLn "" >> printMenu allLists
-                              let countryList2 = nSort $ parseNinjas (toUpper (head cCode2)) allLists
+                              if (capitalize cCode2) /= (capitalize cCode1)
+                              then do
+                                 putStr ""
+                              else do
+                                 putStrLn "You have entered the same country code twice. Please choose again."
+                                 putStrLn "" >> printMenu allLists
+                              let countryList2 = nSort $ parseNinjas (capitalize cCode2) allLists  -- function application
                               if checkIfPromoted countryList2 == True
                               then do 
                                  putStrLn "This country has already one promoted ninja and can no longer take place in fights. Please choose again."
@@ -207,7 +218,7 @@ printMenu allLists = do
                                  let ninjaLists = makeFight findNinja countryList1 countryList2 (name (head countryList1)) (name (head countryList2))
                                  putStr "Winner: "
                                  printNinja2 (head (fst ninjaLists))
-                                 putStrLn "" >> printMenu (findRemainingLists (toUpper (head cCode1)) (toUpper (head cCode2)) allLists (fst ninjaLists) (snd ninjaLists)) -- burada inputu güncellememiz gerekecek sanırım
+                                 putStrLn "" >> printMenu (findRemainingLists (toUpper (head cCode1)) (toUpper (head cCode2)) allLists (fst ninjaLists) (snd ninjaLists)) 
                      'e' -> do
                            printNinjas (getJourneymen allLists)
                            exitSuccess
@@ -387,6 +398,14 @@ updateLists winner name1 name2 nList1 nList2
                                  let loser_ninja = findNinja nList2 name2        -- find the loser ninja by its name
                                  if country winner_ninja == country loser_ninja
                                  then do 
+                                    if new_round >= 3 
+                                    then do
+                                           let new_ninja = (Ninja {name = (name winner_ninja), country = (country winner_ninja), status = "JourneyMan", exam1 = (exam1 winner_ninja), exam2 = (exam2 winner_ninja), ability1 = (ability1 winner_ninja), ability2 = (ability2 winner_ninja), r = new_round, score = new_score})
+                                           let nList1_temp = removeNinja winner_ninja nList2   -- first remove the winner ninja from list so we can push back the promoted version
+                                           let nList1_temp2 = pushList new_ninja nList1_temp   -- push the promoted ninja to back its list
+                                           let nList2_temp = removeNinja loser_ninja nList1_temp2    -- remove the disqualified ninja from country list
+                                           (nList2_temp, nList2_temp) 
+                                    else do 
                                            let new_ninja = (Ninja {name = (name winner_ninja), country = (country winner_ninja), status = "Junior", exam1 = (exam1 winner_ninja), exam2 = (exam2 winner_ninja), ability1 = (ability1 winner_ninja), ability2 = (ability2 winner_ninja), r = new_round, score = new_score})
                                            let nList1_temp = removeNinja winner_ninja nList2   -- first remove the winner ninja from list so we can push back the promoted version
                                            let nList1_temp2 = pushList new_ninja nList1_temp   -- push the promoted ninja to back its list
@@ -415,6 +434,14 @@ updateLists winner name1 name2 nList1 nList2
                                  let loser_ninja = findNinja nList1 name1
                                  if country winner_ninja == country loser_ninja
                                  then do 
+                                    if new_round >= 3
+                                    then do
+                                           let new_ninja = (Ninja {name = (name winner_ninja), country = (country winner_ninja), status = "JourneyMan", exam1 = (exam1 winner_ninja), exam2 = (exam2 winner_ninja), ability1 = (ability1 winner_ninja), ability2 = (ability2 winner_ninja), r = new_round, score = new_score})
+                                           let nList1_temp = removeNinja winner_ninja nList2   -- first remove the winner ninja from list so we can push back the promoted version
+                                           let nList1_temp2 = pushList new_ninja nList1_temp   -- push the promoted ninja to back its list
+                                           let nList2_temp = removeNinja loser_ninja nList1_temp2    -- remove the disqualified ninja from country list
+                                           (nList2_temp, nList2_temp) 
+                                    else do
                                            let new_ninja = (Ninja {name = (name winner_ninja), country = (country winner_ninja), status = "Junior", exam1 = (exam1 winner_ninja), exam2 = (exam2 winner_ninja), ability1 = (ability1 winner_ninja), ability2 = (ability2 winner_ninja), r = new_round, score = new_score})
                                            let nList1_temp = removeNinja winner_ninja nList2   -- first remove the winner ninja from list so we can push back the promoted version
                                            let nList1_temp2 = pushList new_ninja nList1_temp   -- push the promoted ninja to back its list
