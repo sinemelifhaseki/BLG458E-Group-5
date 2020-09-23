@@ -1,26 +1,12 @@
-# BLG458E-Group-5
+# Functional Programming - Chunin Ninja Selection Exam
+This source code was written as the term project of Functional Programming course @ Istanbul Technical University in 2020.
 
-Gülçin Baykal is inviting you to a scheduled Zoom meeting.
+Given a .txt file with Ninjas, their countries, exam scores and abilities, the program aims to find out how the fights amongst ninjas end up, who gets the point and which Ninja gets to be the champion and selected. 
 
-Topic: Friday 12.00
-Time: Jun 12, 2020 12:00 PM Istanbul
+This program uses Functional Programming approaches i.e. compositions, function applications, higher order functions, list comprehensions and currying to carry out all the operations and terminate. 
 
-Join Zoom Meeting
-https://itu-edu-tr.zoom.us/j/97964123006?pwd=Q0VMdnVnYUdDclpWcDc3YVdFZUtsZz09
+## Creating executable
+ghc cse.hs -o cse
 
-Meeting ID: 979 6412 3006
-Password: 395032
-One tap mobile
-+16699006833,,97964123006# US (San Jose)
-+12532158782,,97964123006# US (Tacoma)
-
-Dial by your location
-        +1 669 900 6833 US (San Jose)
-        +1 253 215 8782 US (Tacoma)
-        +1 301 715 8592 US (Germantown)
-        +1 312 626 6799 US (Chicago)
-        +1 346 248 7799 US (Houston)
-        +1 408 638 0968 US (San Jose)
-        +1 646 876 9923 US (New York)
-Meeting ID: 979 6412 3006
-Find your local number: https://itu-edu-tr.zoom.us/u/aei6SaLHFr
+## Execution 
+./cse csereport.txt.
